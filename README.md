@@ -9,11 +9,12 @@ Develop a library for executing jobs with dependencies in the background. There 
 Please don’t use existing libraries like Quartz as a backend for your library. That would defeat the purpose.
 
 Complete solution should include:
-        • brief design document about how it works, architecture and future evolution opportunities
-        • library source code and deployment artifacts ready to be pushed to maven
-        • fair amount of documentation
-        • tests
-        • sample web application running jobs and single page with online (live) job status, progress, etc.
-                • implementing status page without refresh and periodic polling would be a plus
-                • easily runnable application without setup is a must
+
+* brief design document about how it works, architecture and future evolution opportunities
+* library source code and deployment artifacts ready to be pushed to maven
+* fair amount of documentation
+* tests
+* sample web application running jobs and single page with online (live) job status, progress, etc.
+ * implementing status page without refresh and periodic polling would be a plus
+ * easily runnable application without setup is a must
 
