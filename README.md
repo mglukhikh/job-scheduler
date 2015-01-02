@@ -34,8 +34,8 @@ The frond-end is based on the following things:
 * Scheduler, which controls everything
  * It converts each registered Job to Runnable which first do some waiting and then execute the Job itself
  * It is based on some Executor, like fixedThreadPool or scheduledThreadPool
- * It may use Timer and TimerTask to do scheduling
- * Some synchronization must be included because scheduling methods are called from HTTP request threads
+ * It may use Timer and TimerTask to do scheduling. Timer does support absolute timing but scheduledThreadPool does not.
+ * Some synchronization must be included because scheduling methods are called from HTTP request threads. NB: Timer is thread safe
 * Job, which contains some Runnable inside and some scheduling precondition like
  * Time, relative (seconds from now) or absolute (Date)
  * Required jobs to complete first, like Set<Job>
