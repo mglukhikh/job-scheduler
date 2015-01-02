@@ -35,6 +35,7 @@ The frond-end is based on the following things:
  * It converts each registered Job to Runnable which first do some waiting and then execute the Job itself
  * It is based on some Executor, like fixedThreadPool or scheduledThreadPool
  * It may use Timer and TimerTask to do scheduling
+ * Some synchronization must be included because scheduling methods are called from HTTP request threads
 * Job, which contains some Runnable inside and some scheduling precondition like
  * Time, relative (seconds from now) or absolute (Date)
  * Required jobs to complete first, like Set<Job>
@@ -45,4 +46,3 @@ The frond-end is based on the following things:
 
 The back-end can be based on a Java Servlet and included in Glassfish or so. NB: as I know, both this methods will require installation. May be something simple should be implemented instead?
 
-NB: remember that scheduling methods are called from HTTP request threads, so some synchronization is required.
