@@ -18,6 +18,12 @@ Complete solution should include:
  * implementing status page without refresh and periodic polling would be a plus
  * easily runnable application without setup is a must
 
+Job is a code user wants to run asynchronously in the application, so it’s more like a Runnable with extra features. Of course, running a Job has some purpose, so there should be some kind of result. Whether a Job is like Future with a result, like Runnable that should put result somewhere, or like an Observable or Event, that passes result down the chain is up to your design decision.
+
+We’d like to see a web page that demonstrates using a library in a server environment, yes. Not necessary very useful, it should present capabilities to start jobs, may be with parameters, tracking jobs’ progress and observing a result.
+
+Scheduling options should ideally be pluggable/extensible and including basic set of useful schedulers, like one-time job, one-time job with an fire-off alarm, recurring job, triggered when other job has finished, etc. Combinable schedules would be nice, so that I can combine “at specific date/time” and “recurring” schedules to be able to code scenario like “trigger job ’Send best wishes for New Year for respective time zone’ on 31 Dec every year at 17:00 and repeat 8 times with 1 hour interval”.
+
 General thoughts
 ----------------
 
