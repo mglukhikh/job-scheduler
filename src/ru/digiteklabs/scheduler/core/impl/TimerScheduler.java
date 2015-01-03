@@ -13,6 +13,8 @@ import java.util.concurrent.RejectedExecutionException;
 
 /**
  * An implementation of a scheduler based on Timer usage
+ *
+ * NB: look attentively at thread safety!
  */
 public class TimerScheduler implements Scheduler, JobObserver {
 
@@ -190,7 +192,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
      */
     @Override
     public boolean addJob(Job job) throws RejectedExecutionException {
-        if (job.getPlannedTime()==null)
+        if (job.getPlannedTime()==Job.PLANNED_TIME_NEVER)
             throw new RejectedExecutionException("Scheduling not permitted because planned time is NEVER");
         if (jobTaskMap.get(job) != null)
             return false;
@@ -285,7 +287,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
     void reschedule(final Job job) {
         final JobTask jt = jobTaskMap.get(job);
         jt.trySuccessorsExecution();
-        if (job.getPlannedTime() != null)
+        if (job.getPlannedTime() != Job.PLANNED_TIME_NEVER)
             timer.schedule(jt, job.getPlannedTime());
         else if (!jt.hasSuccessors())
             removeJob(job);
