@@ -27,7 +27,7 @@ public interface Scheduler {
      * Register a new job for scheduling.
      *
      * The job should not be accepted for scheduling if a scheduler cannot run it ever.
-     * It may happed if its planned time is null or its required job list includes non-scheduled jobs.
+     * It may happen if its planned time is null or its required job list includes non-scheduled jobs.
      *
      * @param job a new job
      * @return true if job is accepted for scheduling, false if this scheduler already has accepted the job.

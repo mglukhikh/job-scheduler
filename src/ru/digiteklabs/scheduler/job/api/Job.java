@@ -99,4 +99,16 @@ public interface Job extends Runnable {
      */
     int getProgress();
 
+    /**
+     * Adds a new observer for this job's state.
+     *
+     * A job should pass information about progress change and ready status change to all its observers.
+     * A job may not support observers at all, or support just one observer, or support a set of observers.
+     * Also it's possible to have limitations on moments when observers are added. It's better to add
+     * observers before registration in a scheduler.
+     *
+     * @param observer a new observer
+     * @return true if observer is added successfully, false otherwise
+     */
+    boolean addObserver(JobObserver observer);
 }
