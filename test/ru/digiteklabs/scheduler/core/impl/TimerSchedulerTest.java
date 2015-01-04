@@ -6,6 +6,7 @@ import org.junit.Test;
 import ru.digiteklabs.scheduler.core.api.Scheduler;
 import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.samples.OneShotJob;
+import ru.digiteklabs.scheduler.job.samples.SequentialJob;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -111,5 +112,21 @@ public class TimerSchedulerTest {
         assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
         assertTrue(scheduler.getScheduledJobs().isEmpty());
         assertFalse(job.isCompleted());
+    }
+
+    @Test
+    public void testSequentialJob() throws Exception {
+        final Scheduler scheduler = new TimerScheduler();
+        final SequentialJob job = new SequentialJob(10, new Date(Calendar.getInstance().getTimeInMillis() + 500), 100);
+        assertTrue(job.getStage()==0);
+        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        scheduler.addJob(job);
+        Thread.sleep(750);
+        assertTrue(job.getStage() == 3);
+        Thread.sleep(500);
+        assertTrue(job.getStage() == 8);
+        Thread.sleep(500);
+        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(scheduler.getScheduledJobs().isEmpty());
     }
 }

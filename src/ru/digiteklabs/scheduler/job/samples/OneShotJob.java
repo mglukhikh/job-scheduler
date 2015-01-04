@@ -66,7 +66,7 @@ public class OneShotJob extends AbstractJob {
             if (duration > 0)
                 Thread.sleep(duration);
         } catch (InterruptedException e) {
-            System.out.println("One-shot thread is interrupted!");
+            System.out.println("An one-shot job is interrupted!");
         }
         completed = true;
         changeProgress(Job.PROGRESS_FINISHED);
