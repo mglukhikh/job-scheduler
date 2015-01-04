@@ -253,6 +253,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
             throw new ConcurrentModificationException("Unscheduling not permitted because job is running now");
         if (jt.hasSuccessors())
             throw new ConcurrentModificationException("Unscheduling not permitted because job is required by another scheduled job");
+        jt.cancel();
         jobTaskMap.remove(job);
         for (Job required: job.getRequiredJobs()) {
             jobTaskMap.get(required).removeSuccessor(job);
@@ -303,10 +304,14 @@ public class TimerScheduler implements Scheduler, JobObserver {
     void reschedule(final Job job) {
         final JobTask jt = jobTaskMap.get(job);
         jt.trySuccessorsExecution();
-        if (job.getPlannedTime() != Job.PLANNED_TIME_NEVER)
-            timer.schedule(jt, job.getPlannedTime());
-        else if (!jt.hasSuccessors())
+        jt.cancel();
+        if (job.getPlannedTime() != Job.PLANNED_TIME_NEVER) {
+            final JobTask next = new JobTask(job);
+            jobTaskMap.put(job, next);
+            timer.schedule(next, job.getPlannedTime());
+        } else if (!jt.hasSuccessors()) {
             removeJob(job);
+        }
         // NB: who will remove this job if it has successors?
     }
 }
