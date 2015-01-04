@@ -50,11 +50,11 @@ public class TimerScheduler implements Scheduler, JobObserver {
          */
         private final Job job;
 
-        private int progress;
+        private volatile int progress;
 
-        private boolean ready;
+        private volatile boolean ready;
 
-        private JobStatus status;
+        private volatile JobStatus status;
 
         /**
          * A set of job successors that depend on the considered job
@@ -145,8 +145,23 @@ public class TimerScheduler implements Scheduler, JobObserver {
         this.executor = executor;
     }
 
+    /**
+     * Constructs a timer scheduler with a given thread number.
+     *
+     * The scheduler will be based on fixed thread pool
+     *
+     * @param threadNumber a necessary thread number
+     */
     public TimerScheduler(final int threadNumber) {
         this(Executors.newFixedThreadPool(threadNumber));
+    }
+
+    /**
+     * Constructs a timer scheduler with one thread
+     *
+     */
+    public TimerScheduler() {
+        this(1);
     }
 
     /**
@@ -201,6 +216,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
         for (Job required: job.getRequiredJobs()) {
             jobTaskMap.get(required).addSuccessor(job);
         }
+        job.addObserver(this);
         final JobTask jt = new JobTask(job);
         jobTaskMap.put(job, jt);
         //if (job.getPlannedTime().after(calendar.getTime()))
