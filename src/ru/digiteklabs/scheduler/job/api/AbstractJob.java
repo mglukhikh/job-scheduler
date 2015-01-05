@@ -10,17 +10,23 @@ import java.util.Set;
  * Ready status here is always true, but inherited classes may overwrite this method.
  * Observers are supported.
  *
+ * This class is unconditionally thread-safe
+ *
  * @author Mikhail Glukhikh
  */
 public abstract class AbstractJob implements Job {
 
+    // Conditionally thread-safe (except iterators)
     private final Set<JobObserver> observers = Collections.synchronizedSet(new HashSet<JobObserver>());
 
+    // Reference and content are immutable
     private final Set<Job> requiredJobs;
 
-    private Date plannedTime = Job.PLANNED_TIME_NEVER;
+    // Thread-safe
+    private volatile Date plannedTime = Job.PLANNED_TIME_NEVER;
 
-    private int progress = Job.PROGRESS_PLANNED;
+    // Thread-safe
+    private volatile int progress = Job.PROGRESS_PLANNED;
 
     /**
      * A protected method for changing job's planned time.
@@ -43,8 +49,11 @@ public abstract class AbstractJob implements Job {
      */
     protected final void changeProgress(final int progress) {
         this.progress = progress;
-        for (JobObserver observer: observers) {
-            observer.progressChanged(this, progress);
+        // Iterating through a synchronized set requires external synchronization
+        synchronized(observers) {
+            for (JobObserver observer : observers) {
+                observer.progressChanged(this, progress);
+            }
         }
     }
 

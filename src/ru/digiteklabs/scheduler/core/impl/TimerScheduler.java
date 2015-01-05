@@ -6,15 +6,12 @@ import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.api.JobObserver;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.*;
 
 /**
  * An implementation of a scheduler based on Timer usage
  *
- * NB: look attentively at thread safety!
+ * Hope this class is thread safe. Check again!
  */
 public class TimerScheduler implements Scheduler, JobObserver {
 
@@ -41,12 +38,14 @@ public class TimerScheduler implements Scheduler, JobObserver {
     }
 
     /**
-     * An inner class which saves all information about a job inside TimerScheduler
+     * An inner class which saves all information about a job inside TimerScheduler.
+     *
+     * This class is unconditionally thread-safe
      */
     private class JobTask extends TimerTask {
 
         /**
-         * The job bound to this task
+         * The job bound to this task, immutable
          */
         private final Job job;
 
@@ -57,7 +56,8 @@ public class TimerScheduler implements Scheduler, JobObserver {
         private volatile JobStatus status;
 
         /**
-         * A set of job successors that depend on the considered job
+         * A set of job successors that depend on the considered job,
+         * conditionally thread-safe except iterators
          */
         private final Set<Job> successors = Collections.synchronizedSet(new HashSet<Job>());
 
@@ -97,10 +97,13 @@ public class TimerScheduler implements Scheduler, JobObserver {
         }
 
         void trySuccessorsExecution() {
-            for (Job successor: successors) {
-                final JobTask jt = jobTaskMap.get(successor);
-                if (jt != null)
-                    jt.tryExecution();
+            // Iteration requires external synchronization here
+            synchronized(successors) {
+                for (Job successor : successors) {
+                    final JobTask jt = jobTaskMap.get(successor);
+                    if (jt != null)
+                        jt.tryExecution();
+                }
             }
         }
 
@@ -133,13 +136,28 @@ public class TimerScheduler implements Scheduler, JobObserver {
         }
     }
 
-    //private final Calendar calendar = Calendar.getInstance();
-
+    /**
+     * Timer is used for scheduling initial job checking when its planned time is reached.
+     *
+     * Timer class is thread-safe
+     */
     private final Timer timer = new Timer();
 
+    /**
+     * Executor is used for execution of jobs run() methods
+     *
+     * Thread pool based implementations are thread safe
+     */
     private final Executor executor;
 
-    private final Map<Job, JobTask> jobTaskMap = new ConcurrentHashMap<Job, JobTask>();
+    /**
+     * Binds Jobs to JobTasks with all auxiliary information about this job
+     *
+     * Concurrent hash map is thread safe. However, it includes some invariants that must be obeyed:<ul>
+     *     <li>if job is inside than its required jobs are also inside</li>
+     * </ul>
+     */
+    private final ConcurrentMap<Job, JobTask> jobTaskMap = new ConcurrentHashMap<Job, JobTask>();
 
     protected TimerScheduler(@NotNull final Executor executor) {
         this.executor = executor;
@@ -209,19 +227,22 @@ public class TimerScheduler implements Scheduler, JobObserver {
     public boolean addJob(Job job) throws RejectedExecutionException {
         if (job.getPlannedTime()==Job.PLANNED_TIME_NEVER)
             throw new RejectedExecutionException("Scheduling not permitted because planned time is NEVER");
-        if (jobTaskMap.get(job) != null)
-            return false;
-        if (!jobTaskMap.keySet().containsAll(job.getRequiredJobs()))
-            throw new RejectedExecutionException("Scheduling not permitted because required jobs are not scheduled");
-        for (Job required: job.getRequiredJobs()) {
-            jobTaskMap.get(required).addSuccessor(job);
+        // Synchronizing to prevent any magic with jobTaskMap invariants
+        synchronized(jobTaskMap) {
+            if (jobTaskMap.get(job) != null)
+                return false;
+            if (!jobTaskMap.keySet().containsAll(job.getRequiredJobs()))
+                throw new RejectedExecutionException("Scheduling not permitted because required jobs are not scheduled");
+            for (Job required : job.getRequiredJobs()) {
+                jobTaskMap.get(required).addSuccessor(job);
+            }
+            job.addObserver(this);
+            final JobTask jt = new JobTask(job);
+            jobTaskMap.put(job, jt);
+            //if (job.getPlannedTime().after(calendar.getTime()))
+            // if planned time is in the past, task is scheduled for immediate execution
+            timer.schedule(jt, job.getPlannedTime());
         }
-        job.addObserver(this);
-        final JobTask jt = new JobTask(job);
-        jobTaskMap.put(job, jt);
-        //if (job.getPlannedTime().after(calendar.getTime()))
-        // if planned time is in the past, task is scheduled for immediate execution
-        timer.schedule(jt, job.getPlannedTime());
         return true;
     }
 
@@ -246,17 +267,23 @@ public class TimerScheduler implements Scheduler, JobObserver {
      */
     @Override
     public boolean removeJob(Job job) throws ConcurrentModificationException {
-        final JobTask jt = jobTaskMap.get(job);
-        if (jt == null)
-            return false;
-        if (jt.getExecutionStatus() == JobStatus.RUN)
-            throw new ConcurrentModificationException("Unscheduling not permitted because job is running now");
-        if (jt.hasSuccessors())
-            throw new ConcurrentModificationException("Unscheduling not permitted because job is required by another scheduled job");
-        jt.cancel();
-        jobTaskMap.remove(job);
-        for (Job required: job.getRequiredJobs()) {
-            jobTaskMap.get(required).removeSuccessor(job);
+        // Synchronizing to prevent any magic with jobTaskMap invariants
+        synchronized (jobTaskMap) {
+            final JobTask jt = jobTaskMap.get(job);
+            if (jt == null)
+                return false;
+            if (jt.getExecutionStatus() == JobStatus.RUN)
+                throw new ConcurrentModificationException("Unscheduling not permitted because job is running now");
+            if (jt.hasSuccessors())
+                throw new ConcurrentModificationException("Unscheduling not permitted because job is required by another scheduled job");
+            jt.cancel();
+            jobTaskMap.remove(job);
+            for (Job required : job.getRequiredJobs()) {
+                final JobTask rt = jobTaskMap.get(required);
+                // required must be inside because job was inside
+                assert(rt != null);
+                rt.removeSuccessor(job);
+            }
         }
         return true;
     }
@@ -303,12 +330,16 @@ public class TimerScheduler implements Scheduler, JobObserver {
      */
     void reschedule(final Job job) {
         final JobTask jt = jobTaskMap.get(job);
+        if (jt == null) {
+            // Somebody has already removed this job, it's quite possible
+            return;
+        }
         jt.trySuccessorsExecution();
         jt.cancel();
         if (job.getPlannedTime() != Job.PLANNED_TIME_NEVER) {
             final JobTask next = new JobTask(job);
-            jobTaskMap.put(job, next);
-            timer.schedule(next, job.getPlannedTime());
+            if (jobTaskMap.replace(job, jt, next))
+                timer.schedule(next, job.getPlannedTime());
         } else if (!jt.hasSuccessors()) {
             removeJob(job);
         }

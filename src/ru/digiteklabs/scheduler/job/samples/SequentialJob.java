@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class SequentialJob extends AbstractJob {
 
-    private int stage = 0;
+    private volatile int stage = 0;
 
     private final int stages;
 

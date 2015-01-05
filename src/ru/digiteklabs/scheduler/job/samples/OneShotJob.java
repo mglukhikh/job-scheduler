@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class OneShotJob extends AbstractJob {
 
-    private boolean completed = false;
+    private volatile boolean completed = false;
 
     private final long duration;
 

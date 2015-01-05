@@ -16,7 +16,7 @@ public class PeriodicJob extends AbstractJob {
 
     private final long duration, pause;
 
-    private int launchNumber = 0;
+    private volatile int launchNumber = 0;
 
     /**
      * Constructs a periodic job that will start at a given time and will run for a given duration,
