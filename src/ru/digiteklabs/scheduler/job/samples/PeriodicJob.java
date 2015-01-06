@@ -52,4 +52,9 @@ public class PeriodicJob extends AbstractJob {
         changeProgress(Job.PROGRESS_FINISHED);
         changePlannedTime(new Date(Calendar.getInstance().getTimeInMillis() + pause));
     }
+
+    @Override
+    public String toString() {
+        return "Periodic #" + launchNumber;
+    }
 }
