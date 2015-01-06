@@ -7,8 +7,10 @@ import ru.digiteklabs.scheduler.core.api.Scheduler;
 import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.samples.*;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -145,6 +147,27 @@ public class TimerSchedulerTest {
         scheduler.removeJob(job);
         Thread.sleep(1000);
         assertTrue(job.getLaunchNumber() == 3);
+    }
+
+    @Test
+    public void testPeriodicJobSet() throws Exception {
+        final Scheduler scheduler = new TimerScheduler();
+        final List<PeriodicJob> jobs = new ArrayList<PeriodicJob>(50);
+        for (int i=0; i<50; i++) {
+            final PeriodicJob job = new PeriodicJob(new Date(Calendar.getInstance().getTimeInMillis() + i*100), 10, 990);
+            jobs.add(job);
+            scheduler.addJob(job);
+        }
+        Thread.sleep(1500);
+        assertTrue(jobs.get(0).getLaunchNumber() == 2);
+        assertTrue(jobs.get(4).getLaunchNumber() == 2);
+        assertTrue(jobs.get(6).getLaunchNumber() == 1);
+        assertTrue(jobs.get(13).getLaunchNumber() == 1);
+        Thread.sleep(1500);
+        assertTrue(jobs.get(2).getLaunchNumber() == 3);
+        assertTrue(jobs.get(7).getLaunchNumber() == 3);
+        assertTrue(jobs.get(28).getLaunchNumber() == 1);
+        assertTrue(jobs.get(13).getLaunchNumber() == 2);
     }
 
     @Test
