@@ -5,9 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.digiteklabs.scheduler.core.api.Scheduler;
 import ru.digiteklabs.scheduler.job.api.Job;
-import ru.digiteklabs.scheduler.job.samples.OneShotJob;
-import ru.digiteklabs.scheduler.job.samples.PeriodicJob;
-import ru.digiteklabs.scheduler.job.samples.SequentialJob;
+import ru.digiteklabs.scheduler.job.samples.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -147,5 +145,36 @@ public class TimerSchedulerTest {
         scheduler.removeJob(job);
         Thread.sleep(1000);
         assertTrue(job.getLaunchNumber() == 3);
+    }
+
+    @Test
+    public void testPrimeCalcJob() throws Exception {
+        final Scheduler scheduler = new TimerScheduler();
+        final PrimeCalcJob job = new PrimeCalcJob(Calendar.getInstance().getTime(), 10);
+        scheduler.addJob(job);
+        Thread.sleep(100);
+        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.getPrimes().size() == 4);
+    }
+
+    @Test
+    public void testPrimeCheckJob() throws Exception {
+        final Scheduler scheduler = new TimerScheduler();
+        final PrimeCalcJob job = new PrimeCalcJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 100);
+        final PrimeCheckJob checkJob = new PrimeCheckJob(Calendar.getInstance().getTime(), job, 1009);
+        final PrimeCheckJob checkJob2 = new PrimeCheckJob(new Date(Calendar.getInstance().getTimeInMillis() + 1500), job, 1003);
+        scheduler.addJob(job);
+        scheduler.addJob(checkJob);
+        scheduler.addJob(checkJob2);
+        Thread.sleep(200);
+        assertTrue(checkJob.getProgress() == Job.PROGRESS_PLANNED);
+        assertTrue(checkJob2.getProgress() == Job.PROGRESS_PLANNED);
+        Thread.sleep(800);
+        assertTrue(checkJob.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(checkJob2.getProgress() == Job.PROGRESS_PLANNED);
+        assertSame(PrimeCheckJob.CheckResult.PRIME, checkJob.getResult());
+        Thread.sleep(800);
+        assertTrue(checkJob2.getProgress() == Job.PROGRESS_FINISHED);
+        assertSame(PrimeCheckJob.CheckResult.NOT_PRIME, checkJob2.getResult());
     }
 }
