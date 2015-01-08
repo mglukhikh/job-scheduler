@@ -1,6 +1,6 @@
 package ru.digiteklabs.scheduler.core.impl;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 import ru.digiteklabs.scheduler.core.api.Scheduler;
 import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.api.JobObserver;
