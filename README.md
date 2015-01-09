@@ -1,6 +1,37 @@
 job-scheduler
 =============
 
+Architecture
+------------
+
+The developed project includes the following:
+
+* a front end with Job and Scheduler interfaces, TimerScheduler as a scheduler implementation, AbstractJob skeleton plus some sample Job implementations
+* some tests for the front end
+* a back end with a toy server based on an HttpServer instance, and a toy environment that contains a scheduler and a set of jobs
+ 
+Front end
+---------
+ 
+The job interface includes three scheduling opportunities. Implementations can use them together, in this case they are joined by logical and.
+
+* by a planned time, not earlier than a given moment
+* by a set of required jobs, all of them must be completed before execution
+* by the ready status which must be true before execution (actually it's a direction for some advancement, at this moment sample jobs do not use this ready status)
+ 
+Also, JobObserver interface is included to observe job progress and job ready status.
+
+A scheduler can add and remove jobs. Also, it can give a set of currently scheduled jobs.
+
+A given implementation of a scheduler is based on a timer to order planned times and on an executor to execute jobs itself. By default, a fixed thread pool is in use. Also, a given implementation observes job's progress and status itself. 
+
+Given tests generally construct a scheduler and a number of jobs, then schedule jobs, then observe on their progress. Tests assume that PC is free enough to schedule everything in time.
+
+Back end
+--------
+
+Back end is very straightforward. At the beginning, server constructs one periodic job and starts. HTML page contains a table with existing jobs, and input elements to construct a new one or delete an existing one. At this moment, periodic polling is in use with Refresh button or auto-refresh once per minute.
+
 Initiating letter
 -----------------
 
