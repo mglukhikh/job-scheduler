@@ -148,7 +148,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
      *
      * Thread pool based implementations are thread safe
      */
-    private final Executor executor;
+    private final ExecutorService executor;
 
     /**
      * Binds Jobs to JobTasks with all auxiliary information about this job
@@ -159,7 +159,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
      */
     private final ConcurrentMap<Job, JobTask> jobTaskMap = new ConcurrentHashMap<Job, JobTask>();
 
-    protected TimerScheduler(@NotNull final Executor executor) {
+    protected TimerScheduler(@NotNull final ExecutorService executor) {
         this.executor = executor;
     }
 

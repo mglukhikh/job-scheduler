@@ -20,6 +20,9 @@ public class ToyEnvironment {
 
     private final Calendar calendar = Calendar.getInstance();
 
+    /**
+     * Create an environment with a sample periodic job, duration 1s, period 10s
+     */
     public ToyEnvironment() {
         final Job job = new PeriodicJob(calendar.getTime(), 1000, 10000);
         jobs.put("First", job);
@@ -33,6 +36,26 @@ public class ToyEnvironment {
             sb.append(entry.getKey()).append(": ").append(entry.getValue());
             sb.append(" -> ").append(entry.getValue().getProgress()).append("/1000\n");
         }
+        return sb.toString();
+    }
+
+    static private int getProgressValue(final Job job) {
+        final int progress = job.getProgress();
+        return progress < 0 ? 0 : (progress > Job.PROGRESS_FINISHED ? Job.PROGRESS_FINISHED : progress);
+    }
+
+    public String toHtml() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("<form id=\"main\"><table><tr><th>Job</th><th>Status</th><th>Progress</th><th></th></tr>");
+        for (Map.Entry<String, Job> entry: jobs.entrySet()) {
+            sb.append("<tr><td>").append(entry.getKey()).append("</td><td>");
+            sb.append(entry.getValue()).append("</td><td>");
+            sb.append("<progress value=\"").append(getProgressValue(entry.getValue())).append("\"");
+            sb.append(" max=\"").append(Job.PROGRESS_FINISHED).append("\"/></td><td>");
+            sb.append("<button type=\"submit\" name=\"remove\" value=\"").append(entry.getKey());
+            sb.append("\">Remove</button>");
+        }
+        sb.append("</table></form>");
         return sb.toString();
     }
 }

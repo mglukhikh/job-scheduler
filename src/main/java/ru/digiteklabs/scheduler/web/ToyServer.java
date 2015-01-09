@@ -19,9 +19,25 @@ public class ToyServer {
 
     private class ConnectionHandler implements HttpHandler {
 
+        static private final String NEW_JOB_FORM = "<form id=\"new\"><table>" +
+                "<tr><th></th><th>Name</th><th>Type</th><th>Time</th><th>Parameter</th></tr>" +
+                "<tr><td><button type=\"submit\" value=\"new\">New Job</button></td>" +
+                "<td><input type=\"text\" name=\"name\"></td>" +
+                "<td><select name=\"type\">" +
+                "<option value=\"oneshot\">One Shot</option>" +
+                "<option value=\"periodic\">Periodic</option>" +
+                "<option value=\"sequential\">Sequential</option>" +
+                "</select></td>" +
+                "<td><input type=\"number\" name=\"time\"></td>" +
+                "<td><input type=\"number\" name=\"param\"></td></tr>" +
+                "</table></form>";
+
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
-            String response = "Hello from a toy server\n" + environment;
+            System.out.println(httpExchange.getRequestMethod());
+            System.out.println(httpExchange.getRequestURI());
+            String response = "<p>Hello from a toy server</p>\n" +
+                    environment.toHtml() + NEW_JOB_FORM;
             httpExchange.sendResponseHeaders(200, response.length());
             OutputStream out = httpExchange.getResponseBody();
             out.write(response.getBytes());
