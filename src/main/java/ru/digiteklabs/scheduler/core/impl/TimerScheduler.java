@@ -2,6 +2,7 @@ package ru.digiteklabs.scheduler.core.impl;
 
 import org.jetbrains.annotations.NotNull;
 import ru.digiteklabs.scheduler.core.api.Scheduler;
+import ru.digiteklabs.scheduler.core.api.SchedulingException;
 import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.api.JobObserver;
 
@@ -220,19 +221,19 @@ public class TimerScheduler implements Scheduler, JobObserver {
      *
      * @param job a new job
      * @return true if job is accepted for scheduling, false if this scheduler already has accepted the job.
-     * @throws java.util.concurrent.RejectedExecutionException if the job cannot be accepted for execution, particularly
+     * @throws SchedulingException if the job cannot be accepted for execution, particularly
      * if its planned time is null, its required job list is null or includes jobs that are not on scheduling list.
      */
     @Override
-    public boolean addJob(Job job) throws RejectedExecutionException {
+    public boolean addJob(Job job) throws SchedulingException {
         if (job.getPlannedTime()==Job.PLANNED_TIME_NEVER)
-            throw new RejectedExecutionException("Scheduling not permitted because planned time is NEVER");
+            throw new SchedulingException("Scheduling not permitted because planned time is NEVER");
         // Synchronizing to prevent any magic with jobTaskMap invariants
         synchronized(jobTaskMap) {
             if (jobTaskMap.get(job) != null)
                 return false;
             if (!jobTaskMap.keySet().containsAll(job.getRequiredJobs()))
-                throw new RejectedExecutionException("Scheduling not permitted because required jobs are not scheduled");
+                throw new SchedulingException("Scheduling not permitted because required jobs are not scheduled");
             for (Job required : job.getRequiredJobs()) {
                 jobTaskMap.get(required).addSuccessor(job);
             }
@@ -261,21 +262,21 @@ public class TimerScheduler implements Scheduler, JobObserver {
      *
      * @param job a job already accepted for scheduling.
      * @return true if job is successfully unregistered, false if job is not on scheduling list
-     * @throws java.util.ConcurrentModificationException if the job is on scheduling list but cannot be removed
+     * @throws SchedulingException if the job is on scheduling list but cannot be removed
      * at this moment because of scheduling politics, e.g. if it runs now (not necessary) or if it is requires
      * for another job on scheduling list.
      */
     @Override
-    public boolean removeJob(Job job) throws ConcurrentModificationException {
+    public boolean removeJob(Job job) throws SchedulingException {
         // Synchronizing to prevent any magic with jobTaskMap invariants
         synchronized (jobTaskMap) {
             final JobTask jt = jobTaskMap.get(job);
             if (jt == null)
                 return false;
             if (jt.getExecutionStatus() == JobStatus.RUN)
-                throw new ConcurrentModificationException("Unscheduling not permitted because job is running now");
+                throw new SchedulingException("Unscheduling not permitted because job is running now");
             if (jt.hasSuccessors())
-                throw new ConcurrentModificationException("Unscheduling not permitted because job is required by another scheduled job");
+                throw new SchedulingException("Unscheduling not permitted because job is required by another scheduled job");
             jt.cancel();
             jobTaskMap.remove(job);
             for (Job required : job.getRequiredJobs()) {
@@ -341,7 +342,12 @@ public class TimerScheduler implements Scheduler, JobObserver {
             if (jobTaskMap.replace(job, jt, next))
                 timer.schedule(next, job.getPlannedTime());
         } else if (!jt.hasSuccessors()) {
-            removeJob(job);
+            try {
+                removeJob(job);
+            } catch (SchedulingException ex) {
+                // Should not occur
+                throw new AssertionError("Cannot remove job in TimerScheduler.reschedule!");
+            }
         }
         // NB: who will remove this job if it has successors?
     }

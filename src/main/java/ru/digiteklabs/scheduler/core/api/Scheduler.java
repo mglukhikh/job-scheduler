@@ -2,9 +2,7 @@ package ru.digiteklabs.scheduler.core.api;
 
 import ru.digiteklabs.scheduler.job.api.Job;
 
-import java.util.ConcurrentModificationException;
 import java.util.Set;
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Common interface for all schedulers.
@@ -31,10 +29,10 @@ public interface Scheduler {
      *
      * @param job a new job
      * @return true if job is accepted for scheduling, false if this scheduler already has accepted the job.
-     * @throws RejectedExecutionException if the job cannot be accepted for execution, particularly
+     * @throws SchedulingException if the job cannot be accepted for execution, particularly
      * if its planned time is null, its required job list is null or includes jobs that are not on scheduling list.
      */
-    boolean addJob(Job job) throws RejectedExecutionException;
+    boolean addJob(Job job) throws SchedulingException;
 
     /**
      * Unregister a job from scheduling.
@@ -51,11 +49,11 @@ public interface Scheduler {
      *
      * @param job a job already accepted for scheduling.
      * @return true if job is successfully unregistered, false if job is not on scheduling list
-     * @throws ConcurrentModificationException if the job is on scheduling list but cannot be removed
+     * @throws SchedulingException if the job is on scheduling list but cannot be removed
      * at this moment because of scheduling politics, e.g. if it runs now (not necessary) or if it is requires
      * for another job on scheduling list.
      */
-    boolean removeJob(Job job) throws ConcurrentModificationException;
+    boolean removeJob(Job job) throws SchedulingException;
 
     /**
      * Gets information about all scheduled jobs.

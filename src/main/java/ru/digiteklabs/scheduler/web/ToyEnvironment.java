@@ -1,6 +1,7 @@
 package ru.digiteklabs.scheduler.web;
 
 import ru.digiteklabs.scheduler.core.api.Scheduler;
+import ru.digiteklabs.scheduler.core.api.SchedulingException;
 import ru.digiteklabs.scheduler.core.impl.TimerScheduler;
 import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.samples.PeriodicJob;
@@ -26,7 +27,34 @@ public class ToyEnvironment {
     public ToyEnvironment() {
         final Job job = new PeriodicJob(calendar.getTime(), 1000, 10000);
         jobs.put("First", job);
-        scheduler.addJob(job);
+        try {
+            scheduler.addJob(job);
+        } catch (SchedulingException ex) {
+            // Should not occur
+            throw new AssertionError("Cannot create a job in a toy environment constructor!");
+        }
+    }
+
+    public boolean removeJob(final String name) throws SchedulingException {
+        if (jobs.containsKey(name)) {
+            final Job job = jobs.get(name);
+            if (scheduler.removeJob(job)) {
+                jobs.remove(name);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addJob(final String name, final Job job) throws SchedulingException {
+        if (jobs.containsKey(name))
+            return false;
+        if (scheduler.addJob(job)) {
+            jobs.put(name, job);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
