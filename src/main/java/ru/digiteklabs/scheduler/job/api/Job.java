@@ -73,6 +73,16 @@ public interface Job extends Runnable {
      */
     boolean getReadyStatus();
 
+    /**
+     * Gets information whether this job is deleted automatically from scheduling if completed
+     *
+     * Normally, this method should return true but for jobs that have successors
+     * it's better to return false.
+     *
+     * @return true if it's allowed to delete job on completion, false otherwise
+     */
+    boolean autoDeletedOnCompletion();
+
     static final int PROGRESS_NEVER = -1000;
     static final int PROGRESS_PLANNED = -1;
     static final int PROGRESS_STARTED = 0;

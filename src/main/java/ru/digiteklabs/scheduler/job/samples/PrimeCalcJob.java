@@ -3,10 +3,7 @@ package ru.digiteklabs.scheduler.job.samples;
 import ru.digiteklabs.scheduler.job.api.AbstractJob;
 import ru.digiteklabs.scheduler.job.api.Job;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Sample job with a purpose of calculating prime numbers.
@@ -34,9 +31,10 @@ public class PrimeCalcJob extends AbstractJob {
     public void run() {
         changeProgress(Job.PROGRESS_STARTED);
         primes.add(2);
-        search: for (int i=3; i<=limit; i+=2) {
-            for (int pr: primes) {
-                if (pr*pr > i)
+        search:
+        for (int i = 3; i <= limit; i += 2) {
+            for (int pr : primes) {
+                if (pr * pr > i)
                     break;
                 if (i % pr == 0)
                     continue search;
@@ -45,5 +43,22 @@ public class PrimeCalcJob extends AbstractJob {
         }
         changeProgress(Job.PROGRESS_FINISHED);
         changePlannedTime(Job.PLANNED_TIME_NEVER);
+    }
+
+    /**
+     * Gets information whether this job is deleted automatically from scheduling if completed
+     *
+     * Normally, this method should return true but for jobs that have successors
+     * it's better to return false.
+     *
+     * @return true if it's allowed to delete job on completion, false otherwise
+     */
+    public boolean autoDeletedOnCompletion() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Prime calculator: " + primes.size() + " primes up to " + limit;
     }
 }

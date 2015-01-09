@@ -1,5 +1,6 @@
 package ru.digiteklabs.scheduler.job.samples;
 
+import org.jetbrains.annotations.NotNull;
 import ru.digiteklabs.scheduler.job.api.AbstractJob;
 import ru.digiteklabs.scheduler.job.api.Job;
 
@@ -25,7 +26,7 @@ public class PrimeCheckJob extends AbstractJob {
 
     private volatile CheckResult result;
 
-    public PrimeCheckJob(final Date plannedTime, final PrimeCalcJob calcJob, final int number) {
+    public PrimeCheckJob(final Date plannedTime, final @NotNull PrimeCalcJob calcJob, final int number) {
         super(plannedTime, Collections.<Job>singleton(calcJob));
         this.calcJob = calcJob;
         this.number = number;
@@ -53,5 +54,23 @@ public class PrimeCheckJob extends AbstractJob {
             result = CheckResult.PRIME;
         changeProgress(Job.PROGRESS_FINISHED);
         changePlannedTime(Job.PLANNED_TIME_NEVER);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Prime checker: ").append(number).append(" is ");
+        switch (result) {
+            case PRIME:
+                sb.append("prime");
+                break;
+            case NOT_PRIME:
+                sb.append("not prime");
+                break;
+            default:
+                sb.append("unknown");
+                break;
+        }
+        return sb.toString();
     }
 }

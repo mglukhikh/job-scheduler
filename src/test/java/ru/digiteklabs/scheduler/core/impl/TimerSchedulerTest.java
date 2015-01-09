@@ -197,7 +197,7 @@ public class TimerSchedulerTest {
         assertTrue(checkJob2.getProgress() == Job.PROGRESS_PLANNED);
         assertSame(PrimeCheckJob.CheckResult.PRIME, checkJob.getResult());
         Thread.sleep(800);
-        assertTrue(checkJob2.getProgress() == Job.PROGRESS_FINISHED);
+        assertEquals(Job.PROGRESS_FINISHED, checkJob2.getProgress());
         assertSame(PrimeCheckJob.CheckResult.NOT_PRIME, checkJob2.getResult());
     }
 }

@@ -6,9 +6,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.jetbrains.annotations.NotNull;
 import ru.digiteklabs.scheduler.core.api.SchedulingException;
 import ru.digiteklabs.scheduler.job.api.Job;
-import ru.digiteklabs.scheduler.job.samples.OneShotJob;
-import ru.digiteklabs.scheduler.job.samples.PeriodicJob;
-import ru.digiteklabs.scheduler.job.samples.SequentialJob;
+import ru.digiteklabs.scheduler.job.samples.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,13 +29,16 @@ public class ToyServer {
                 "<meta http-equiv=\"refresh\" content=\"60\" /></head>";
 
         static private final String NEW_JOB_FORM = "<form id=\"new\"><table>" +
-                "<tr><th></th><th>Name</th><th>Type</th><th>Time</th><th>Parameter</th></tr>" +
+                "<tr><th></th><th>Name</th><th>Type</th>" +
+                "<th>Start time (ms from now)</th><th>Duration (ms)/Limit/Number to check</th></tr>" +
                 "<tr><td><button type=\"submit\" value=\"new\">New Job</button></td>" +
                 "<td><input type=\"text\" name=\"name\"></td>" +
                 "<td><select name=\"type\">" +
                 "<option value=\"oneshot\">One Shot</option>" +
                 "<option value=\"periodic\">Periodic</option>" +
                 "<option value=\"sequential\">Sequential</option>" +
+                "<option value=\"calculator\">Prime Calculator</option>" +
+                "<option value=\"checker\">Prime Checker</option>" +
                 "</select></td>" +
                 "<td><input type=\"number\" name=\"time\"></td>" +
                 "<td><input type=\"number\" name=\"param\"></td></tr>" +
@@ -87,6 +88,14 @@ public class ToyServer {
                     job = new PeriodicJob(date, nParam, nTime);
                 } else if ("sequential".equals(type)) {
                     job = new SequentialJob(10, date, nParam);
+                } else if ("calculator".equals(type)) {
+                    job = new PrimeCalcJob(date, nParam);
+                } else if ("checker".equals(type)) {
+                    final PrimeCalcJob calcJob = environment.getCalcJob();
+                    if (calcJob == null)
+                        job = null;
+                    else
+                        job = new PrimeCheckJob(date, calcJob, nParam);
                 } else {
                     job = null;
                 }

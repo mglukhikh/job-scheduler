@@ -341,7 +341,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
             final JobTask next = new JobTask(job);
             if (jobTaskMap.replace(job, jt, next))
                 timer.schedule(next, job.getPlannedTime());
-        } else if (!jt.hasSuccessors()) {
+        } else if (job.autoDeletedOnCompletion() && !jt.hasSuccessors()) {
             try {
                 removeJob(job);
             } catch (SchedulingException ex) {
@@ -349,6 +349,6 @@ public class TimerScheduler implements Scheduler, JobObserver {
                 throw new AssertionError("Cannot remove job in TimerScheduler.reschedule!");
             }
         }
-        // NB: who will remove this job if it has successors?
+        // NB: job with successors should be deleted manually
     }
 }

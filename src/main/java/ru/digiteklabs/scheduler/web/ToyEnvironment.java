@@ -5,6 +5,7 @@ import ru.digiteklabs.scheduler.core.api.SchedulingException;
 import ru.digiteklabs.scheduler.core.impl.TimerScheduler;
 import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.samples.PeriodicJob;
+import ru.digiteklabs.scheduler.job.samples.PrimeCalcJob;
 
 import java.util.*;
 
@@ -20,6 +21,8 @@ public class ToyEnvironment {
     private final Map<String, Job> jobs = new HashMap<String, Job>();
 
     private final Calendar calendar = Calendar.getInstance();
+
+    private PrimeCalcJob primeCalcJob = null;
 
     /**
      * Create an environment with a sample periodic job, duration 1s, period 10s
@@ -40,6 +43,8 @@ public class ToyEnvironment {
             final Job job = jobs.get(name);
             if (!scheduler.getScheduledJobs().contains(job) || scheduler.removeJob(job)) {
                 jobs.remove(name);
+                if (job==primeCalcJob)
+                    primeCalcJob = null;
                 return true;
             }
         }
@@ -49,12 +54,20 @@ public class ToyEnvironment {
     public boolean addJob(final String name, final Job job) throws SchedulingException {
         if (jobs.containsKey(name))
             return false;
+        if (job instanceof PrimeCalcJob && primeCalcJob != null)
+            return false;
         if (scheduler.addJob(job)) {
             jobs.put(name, job);
+            if (job instanceof PrimeCalcJob)
+                primeCalcJob = (PrimeCalcJob)job;
             return true;
         } else {
             return false;
         }
+    }
+
+    public PrimeCalcJob getCalcJob() {
+        return primeCalcJob;
     }
 
     @Override

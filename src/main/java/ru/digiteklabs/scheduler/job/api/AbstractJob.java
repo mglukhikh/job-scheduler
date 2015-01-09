@@ -141,6 +141,18 @@ public abstract class AbstractJob implements Job {
     }
 
     /**
+     * Gets information whether this job is deleted automatically from scheduling if completed
+     *
+     * Normally, this method should return true but for jobs that have successors
+     * it's better to return false.
+     *
+     * @return true if it's allowed to delete job on completion, false otherwise
+     */
+    public boolean autoDeletedOnCompletion() {
+        return true;
+    }
+
+    /**
      * Gets information about this job progress.
      * <p/>
      * It is an integer with the following meaning:<ul>
