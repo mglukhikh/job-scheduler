@@ -41,6 +41,7 @@ public class PeriodicJob extends AbstractJob {
 
     @Override
     public void run() {
+        launchNumber++;
         changeProgress(Job.PROGRESS_STARTED);
         try {
             if (duration > 0)
@@ -48,7 +49,6 @@ public class PeriodicJob extends AbstractJob {
         } catch (InterruptedException e) {
             System.out.println("A periodic job is interrupted!");
         }
-        launchNumber++;
         changeProgress(Job.PROGRESS_FINISHED);
         changePlannedTime(new Date(Calendar.getInstance().getTimeInMillis() + pause));
     }
