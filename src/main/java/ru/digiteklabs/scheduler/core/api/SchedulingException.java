@@ -7,6 +7,10 @@ package ru.digiteklabs.scheduler.core.api;
  */
 public class SchedulingException extends Exception {
 
+    /**
+     * Constructs a scheduling exception
+     * @param message an exception message
+     */
     public SchedulingException(final String message) {
         super(message);
     }

@@ -25,7 +25,7 @@ public class ToyEnvironment {
     private PrimeCalcJob primeCalcJob = null;
 
     /**
-     * Create an environment with a sample periodic job, duration 1s, period 10s
+     * Creates an environment with a sample periodic job, duration 1s, period 10s
      */
     public ToyEnvironment() {
         final Job job = new PeriodicJob(calendar.getTime(), 1000, 10000);
@@ -38,6 +38,12 @@ public class ToyEnvironment {
         }
     }
 
+    /**
+     * Removes a job with a given name from the environment
+     * @param name a given job name
+     * @return true if a job is successfully removed, false if name does not exist
+     * @throws SchedulingException if name exists but scheduler cannot remove this job
+     */
     public boolean removeJob(final String name) throws SchedulingException {
         if (jobs.containsKey(name)) {
             final Job job = jobs.get(name);
@@ -51,6 +57,14 @@ public class ToyEnvironment {
         return false;
     }
 
+    /**
+     * Adds a new job with a given name to the environment
+     * @param name a given job name
+     * @param job a given job itself
+     * @return true if a job is successfully added, false if name is duplicated or a second
+     * prime calculator is to add
+     * @throws SchedulingException if scheduler cannot add this job
+     */
     public boolean addJob(final String name, final Job job) throws SchedulingException {
         if (jobs.containsKey(name))
             return false;
@@ -66,6 +80,9 @@ public class ToyEnvironment {
         }
     }
 
+    /**
+     * @return a reference to the current prime calculator if exists, null otherwise
+     */
     public PrimeCalcJob getCalcJob() {
         return primeCalcJob;
     }
@@ -85,6 +102,10 @@ public class ToyEnvironment {
         return progress < 0 ? 0 : (progress > Job.PROGRESS_FINISHED ? Job.PROGRESS_FINISHED : progress);
     }
 
+    /**
+     *
+     * @return description of the environment in HTML format
+     */
     public String toHtml() {
         final StringBuilder sb = new StringBuilder();
         sb.append("<form id=\"main\"><table><tr><th>Job</th><th>Status</th><th>Progress</th><th></th></tr>");

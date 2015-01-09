@@ -137,6 +137,10 @@ public class ToyServer {
 
     private String status = "OK";
 
+    /**
+     * Constructs a new toy server with a given thread number
+     * @param threadNumber a necessary thread number
+     */
     public ToyServer(final int threadNumber) {
         executor = Executors.newFixedThreadPool(threadNumber);
         HttpServer server;
@@ -154,6 +158,10 @@ public class ToyServer {
             this.server.start();
     }
 
+    /**
+     * A classic main function
+     * @param args command line arguments, not in use
+     */
     static public void main(String[] args) {
         new ToyServer(1);
     }
