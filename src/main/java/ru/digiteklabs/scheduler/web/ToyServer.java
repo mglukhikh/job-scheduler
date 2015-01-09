@@ -72,33 +72,13 @@ public class ToyServer {
                 }
                 final String name = parsed.get("name");
                 final String type = parsed.get("type");
-                if (name == null || name.isEmpty() || type == null || type.isEmpty())
+                if (name == null || name.isEmpty() || type == null)
                     return;
                 final String time = parsed.get("time");
                 final String param = parsed.get("param");
-                if (time == null || time.isEmpty() || param == null || param.isEmpty())
+                if (time == null || param == null)
                     return;
-                final int nTime = Integer.parseInt(time);
-                final int nParam = Integer.parseInt(param);
-                final Date date = new Date(Calendar.getInstance().getTimeInMillis() + nTime);
-                final Job job;
-                if ("oneshot".equals(type)) {
-                    job = new OneShotJob(date, nParam);
-                } else if ("periodic".equals(type)) {
-                    job = new PeriodicJob(date, nParam, nTime);
-                } else if ("sequential".equals(type)) {
-                    job = new SequentialJob(10, date, nParam);
-                } else if ("calculator".equals(type)) {
-                    job = new PrimeCalcJob(date, nParam);
-                } else if ("checker".equals(type)) {
-                    final PrimeCalcJob calcJob = environment.getCalcJob();
-                    if (calcJob == null)
-                        job = null;
-                    else
-                        job = new PrimeCheckJob(date, calcJob, nParam);
-                } else {
-                    job = null;
-                }
+                final Job job = createJob(type, Integer.parseInt(time), Integer.parseInt(param));
                 if (job != null) {
                     if (environment.addJob(name, job))
                         status = "OK";
@@ -136,6 +116,27 @@ public class ToyServer {
     private final ToyEnvironment environment = new ToyEnvironment();
 
     private String status = "OK";
+
+    private Job createJob(final String type, final int time, final int param) {
+        final Date date = new Date(Calendar.getInstance().getTimeInMillis() + time);
+        if ("oneshot".equals(type)) {
+            return new OneShotJob(date, param);
+        } else if ("periodic".equals(type)) {
+            return new PeriodicJob(date, param, time);
+        } else if ("sequential".equals(type)) {
+            return new SequentialJob(10, date, param);
+        } else if ("calculator".equals(type)) {
+            return new PrimeCalcJob(date, param);
+        } else if ("checker".equals(type)) {
+            final PrimeCalcJob calcJob = environment.getCalcJob();
+            if (calcJob == null)
+                return null;
+            else
+                return new PrimeCheckJob(date, calcJob, param);
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Constructs a new toy server with a given thread number
