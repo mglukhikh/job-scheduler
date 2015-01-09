@@ -72,4 +72,9 @@ public class OneShotJob extends AbstractJob {
         changeProgress(Job.PROGRESS_FINISHED);
         changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
+
+    @Override
+    public String toString() {
+        return "One shot: " + (completed ? "completed" : "not completed");
+    }
 }

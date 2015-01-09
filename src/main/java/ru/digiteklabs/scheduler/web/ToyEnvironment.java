@@ -38,7 +38,7 @@ public class ToyEnvironment {
     public boolean removeJob(final String name) throws SchedulingException {
         if (jobs.containsKey(name)) {
             final Job job = jobs.get(name);
-            if (scheduler.removeJob(job)) {
+            if (!scheduler.getScheduledJobs().contains(job) || scheduler.removeJob(job)) {
                 jobs.remove(name);
                 return true;
             }

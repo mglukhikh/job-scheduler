@@ -53,4 +53,9 @@ public class SequentialJob extends AbstractJob {
         }
         changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
+
+    @Override
+    public String toString() {
+        return stage <= stages ? ("Sequential #" + stage) : "Sequential: completed";
+    }
 }
