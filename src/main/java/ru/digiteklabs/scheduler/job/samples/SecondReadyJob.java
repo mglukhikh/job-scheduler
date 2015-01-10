@@ -6,36 +6,36 @@ import ru.digiteklabs.scheduler.job.api.JobObserver;
 import java.util.Date;
 
 /**
- * A sample of consumer job which is ready after a producer job ends execution
+ * A sample of a ready periodic job which is ready after a bound first job ends execution
  */
-public class ConsumerJob extends ReadyPeriodicJob implements JobObserver {
+public class SecondReadyJob extends ReadyPeriodicJob implements JobObserver {
 
-    private Job producerJob;
+    private Job firstJob;
 
-    public ConsumerJob(final Date plannedTime, long duration) {
+    public SecondReadyJob(final Date plannedTime, long duration) {
         super(plannedTime, duration, false);
-        producerJob = null;
+        firstJob = null;
     }
 
-    public void setProducer(final Job job) {
-        if (producerJob != job && producerJob != null)
-            producerJob.removeObserver(this);
-        producerJob = job;
-        if (producerJob != null)
-            producerJob.addObserver(this);
+    public void setFirst(final Job job) {
+        if (firstJob != job && firstJob != null)
+            firstJob.removeObserver(this);
+        firstJob = job;
+        if (firstJob != null)
+            firstJob.addObserver(this);
     }
 
     /**
      * Called when a given job changes its progress.
      *
-     * The consumer job is ready when a bound job is not executing
+     * The second job is ready when a bound first job is not executing
      *
-     * @param job      a given job, normally should be producer job
+     * @param job      a given job, normally should be the first job
      * @param progress job's progress
      */
     @Override
     public void progressChanged(Job job, int progress) {
-        if (producerJob != job)
+        if (firstJob != job)
             return;
         if (progress != Job.PROGRESS_PLANNED && progress != Job.PROGRESS_FINISHED) {
             changeReadyStatus(false);
@@ -58,7 +58,7 @@ public class ConsumerJob extends ReadyPeriodicJob implements JobObserver {
     @Override
     public void run() {
         super.run();
-        changeReadyStatus(!producerJob.getReadyStatus());
+        changeReadyStatus(!firstJob.getReadyStatus());
     }
 }
 

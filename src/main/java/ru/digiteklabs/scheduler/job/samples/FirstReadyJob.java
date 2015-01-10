@@ -6,38 +6,38 @@ import ru.digiteklabs.scheduler.job.api.JobObserver;
 import java.util.Date;
 
 /**
- * A sample of producer job which is ready at the beginning
- * and after the bound consumer job ends execution. It is not ready
- * when the bound consumer job is on the run
+ * A sample of a ready periodic job which is ready at the beginning
+ * and after the bound second job ends execution. It is not ready
+ * when the bound second job is on the run
  */
-public class ProducerJob extends ReadyPeriodicJob implements JobObserver {
+public class FirstReadyJob extends ReadyPeriodicJob implements JobObserver {
 
-    private Job consumerJob;
+    private Job secondJob;
 
-    public ProducerJob(final Date plannedTime, long duration) {
+    public FirstReadyJob(final Date plannedTime, long duration) {
         super(plannedTime, duration, true);
-        consumerJob = null;
+        secondJob = null;
     }
 
-    public void setConsumer(final Job job) {
-        if (consumerJob != job && consumerJob != null)
-            consumerJob.removeObserver(this);
-        consumerJob = job;
-        if (consumerJob != null)
-            consumerJob.addObserver(this);
+    public void setSecond(final Job job) {
+        if (secondJob != job && secondJob != null)
+            secondJob.removeObserver(this);
+        secondJob = job;
+        if (secondJob != null)
+            secondJob.addObserver(this);
     }
 
     /**
      * Called when a given job changes its progress.
      *
-     * The producer job is ready when a bound job is not executing
+     * The first job is ready when a bound second job is not executing
      *
-     * @param job      a given job, normally should be consumer job
+     * @param job      a given job, normally should be second job
      * @param progress job's progress
      */
     @Override
     public void progressChanged(Job job, int progress) {
-        if (consumerJob != job)
+        if (secondJob != job)
             return;
         if (progress != Job.PROGRESS_PLANNED && progress != Job.PROGRESS_FINISHED) {
             changeReadyStatus(false);
@@ -60,6 +60,6 @@ public class ProducerJob extends ReadyPeriodicJob implements JobObserver {
     @Override
     public void run() {
         super.run();
-        changeReadyStatus(!consumerJob.getReadyStatus());
+        changeReadyStatus(!secondJob.getReadyStatus());
     }
 }

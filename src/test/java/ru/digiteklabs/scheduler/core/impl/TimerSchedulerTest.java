@@ -202,20 +202,20 @@ public class TimerSchedulerTest {
     }
 
     @Test
-    public void testProducerConsumer() throws Exception {
+    public void testFirstSecond() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
-        final ProducerJob producer = new ProducerJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 200);
-        final ConsumerJob consumer = new ConsumerJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 200);
-        producer.setConsumer(consumer);
-        consumer.setProducer(producer);
-        scheduler.addJob(producer);
-        scheduler.addJob(consumer);
-        // 500 ms -- Producer -- Consumer -- Producer -- Consumer -- ...
+        final FirstReadyJob first = new FirstReadyJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 200);
+        final SecondReadyJob second = new SecondReadyJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 200);
+        first.setSecond(second);
+        second.setFirst(first);
+        scheduler.addJob(first);
+        scheduler.addJob(second);
+        // 500 ms -- First -- Second -- First -- Second -- ...
         Thread.sleep(800);
-        assertEquals(1, producer.getLaunchNumber());
-        assertEquals(1, consumer.getLaunchNumber());
+        assertEquals(1, first.getLaunchNumber());
+        assertEquals(1, second.getLaunchNumber());
         Thread.sleep(400);
-        assertEquals(2, producer.getLaunchNumber());
-        assertEquals(2, consumer.getLaunchNumber());
+        assertEquals(2, first.getLaunchNumber());
+        assertEquals(2, second.getLaunchNumber());
     }
 }
