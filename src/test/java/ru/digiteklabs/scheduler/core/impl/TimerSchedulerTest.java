@@ -200,4 +200,22 @@ public class TimerSchedulerTest {
         assertEquals(Job.PROGRESS_FINISHED, checkJob2.getProgress());
         assertSame(PrimeCheckJob.CheckResult.NOT_PRIME, checkJob2.getResult());
     }
+
+    @Test
+    public void testProducerConsumer() throws Exception {
+        final Scheduler scheduler = new TimerScheduler();
+        final ProducerJob producer = new ProducerJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 200);
+        final ConsumerJob consumer = new ConsumerJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 200);
+        producer.setConsumer(consumer);
+        consumer.setProducer(producer);
+        scheduler.addJob(producer);
+        scheduler.addJob(consumer);
+        // 500 ms -- Producer -- Consumer -- Producer -- Consumer -- ...
+        Thread.sleep(800);
+        assertEquals(1, producer.getLaunchNumber());
+        assertEquals(1, consumer.getLaunchNumber());
+        Thread.sleep(400);
+        assertEquals(2, producer.getLaunchNumber());
+        assertEquals(2, consumer.getLaunchNumber());
+    }
 }

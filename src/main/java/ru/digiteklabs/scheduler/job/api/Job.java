@@ -121,4 +121,17 @@ public interface Job extends Runnable {
      * @return true if observer is added successfully, false otherwise
      */
     boolean addObserver(JobObserver observer);
+
+    /**
+     * Removes a new observer for this job's state.
+     *
+     * A job should pass information about progress change and ready status change to all its observers.
+     * A job may not support observers at all, or support just one observer, or support a set of observers.
+     * Also it's possible to have limitations on moments when observers are added or removed.
+     * It's better to add / remove observers before registration in a scheduler.
+     *
+     * @param observer a observer to remove
+     * @return true if observer is removed successfully, false otherwise
+     */
+    boolean removeObserver(JobObserver observer);
 }

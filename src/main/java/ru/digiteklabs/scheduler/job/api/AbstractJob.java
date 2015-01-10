@@ -28,6 +28,9 @@ public abstract class AbstractJob implements Job {
     // Thread-safe
     private volatile int progress = Job.PROGRESS_PLANNED;
 
+    // Thread-safe
+    private volatile boolean readyStatus = true;
+
     /**
      * A protected method for changing job's planned time.
      *
@@ -53,6 +56,21 @@ public abstract class AbstractJob implements Job {
         synchronized(observers) {
             for (JobObserver observer : observers) {
                 observer.progressChanged(this, progress);
+            }
+        }
+    }
+
+    /**
+     * A protected method for changing job's ready status
+     *
+     * @param readyStatus a new job ready status
+     */
+    protected final void changeReadyStatus(final boolean readyStatus) {
+        this.readyStatus = readyStatus;
+        // Iterating through a synchronized set requires external synchronization
+        synchronized(observers) {
+            for (JobObserver observer : observers) {
+                observer.readyChanged(this, readyStatus);
             }
         }
     }
@@ -136,8 +154,8 @@ public abstract class AbstractJob implements Job {
      * @return true if job is ready to run and false otherwise
      */
     @Override
-    public boolean getReadyStatus() {
-        return true;
+    public final boolean getReadyStatus() {
+        return readyStatus;
     }
 
     /**
@@ -191,4 +209,17 @@ public abstract class AbstractJob implements Job {
     public boolean addObserver(JobObserver observer) {
         return observers.add(observer);
     }
+
+    /**
+     * Removes a new observer for this job's state.
+     *
+     * A job should pass information about progress change and ready status change to all its observers.
+     * A job may not support observers at all, or support just one observer, or support a set of observers.
+     * Also it's possible to have limitations on moments when observers are added or removed.
+     * It's better to add / remove observers before registration in a scheduler.
+     *
+     * @param observer a observer to remove
+     * @return true if observer is removed successfully, false otherwise
+     */
+    public boolean removeObserver(JobObserver observer) { return observers.remove(observer); }
 }

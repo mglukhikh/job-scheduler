@@ -10,8 +10,6 @@ import java.util.Date;
  */
 public class ReadyPeriodicJob extends PeriodicJob {
 
-    private boolean readyStatus;
-
     /**
      * Constructs a periodic job that will start at a given time and will run for a given duration,
      * then will wait for a ready status of true and run again, and so
@@ -21,16 +19,19 @@ public class ReadyPeriodicJob extends PeriodicJob {
      */
     ReadyPeriodicJob(final Date plannedTime, long duration, boolean readyStatus) {
         super(plannedTime, duration, 0);
-        this.readyStatus = readyStatus;
+        changeReadyStatus(readyStatus);
     }
 
-    @Override
-    public boolean getReadyStatus() {
-        return readyStatus;
-    }
-
-    void setReadyStatus(boolean readyStatus) {
-        this.readyStatus = readyStatus;
+    /**
+     * Gets information whether this job is deleted automatically from scheduling if completed
+     *
+     * Normally, this method should return true but for jobs that have successors
+     * it's better to return false.
+     *
+     * @return true if it's allowed to delete job on completion, false otherwise
+     */
+    public final boolean autoDeletedOnCompletion() {
+        return false;
     }
 
     @Override

@@ -79,6 +79,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
 
         void setReadyStatus(boolean ready) {
             this.ready = ready;
+            tryExecution();
         }
 
         JobStatus getExecutionStatus() {
@@ -278,6 +279,7 @@ public class TimerScheduler implements Scheduler, JobObserver {
             if (jt.hasSuccessors())
                 throw new SchedulingException("Unscheduling not permitted because job is required by another scheduled job");
             jt.cancel();
+            job.removeObserver(this);
             jobTaskMap.remove(job);
             for (Job required : job.getRequiredJobs()) {
                 final JobTask rt = jobTaskMap.get(required);
