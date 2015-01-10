@@ -17,7 +17,7 @@ The job interface includes three scheduling opportunities. Implementations can u
 
 * by a planned time, not earlier than a given moment
 * by a set of required jobs, all of them must be completed before execution
-* by the ready status which must be true before execution (actually it's a direction for some advancement, at this moment sample jobs do not use this ready status)
+* by the ready status which must be true before execution
  
 Also, JobObserver interface is included to observe job progress and job ready status.
 
@@ -35,8 +35,7 @@ Back end is very straightforward. At the beginning, server constructs one period
 Advancement
 -----------
 
-* Frond-end: Check getReadyStatus(), m.b. using producer-consumer
-* Frond-end: Think about JobObserver and its implementation in TimerScheduler, m.b. split these things
+* Frond-end: Check getReadyStatus(), m.b. using producer-consumer (DONE)
 * Back-end: Try to refresh only job status / progress
 * Back-end: Try to get rid of periodic refreshing
 
