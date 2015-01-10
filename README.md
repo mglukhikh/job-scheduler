@@ -32,6 +32,14 @@ Back end
 
 Back end is very straightforward. At the beginning, server constructs one periodic job and starts. HTML page contains a table with existing jobs, and input elements to construct a new one or delete an existing one. At this moment, periodic polling is in use with Refresh button or auto-refresh once per minute.
 
+Advancement
+-----------
+
+* Frond-end: Check getReadyStatus(), m.b. using producer-consumer
+* Frond-end: Think about JobObserver and its implementation in TimerScheduler, m.b. split these things
+* Back-end: Try to refresh only job status / progress
+* Back-end: Try to get rid of periodic refreshing
+
 Initiating letter
 -----------------
 
