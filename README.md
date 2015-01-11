@@ -35,7 +35,7 @@ Back end is very straightforward. At the beginning, server constructs one period
 Advancement
 -----------
 
-* Frond-end: Check getReadyStatus(), m.b. using producer-consumer (DONE)
+* Frond-end: Check getReadyStatus() (DONE)
 * Back-end: Try to refresh only job status / progress
 * Back-end: Try to get rid of periodic refreshing
 
