@@ -26,7 +26,15 @@ public class ToyServer {
     private class ConnectionHandler implements HttpHandler {
 
         static private final String HTML_HEAD = "<head><title>Toy Scheduling Server</title>" +
-                "<meta http-equiv=\"refresh\" content=\"60\" /></head>";
+                "<script type=\"text/javascript\" src=\"http://code.jquery.com/jquery-latest.js\"></script>" +
+                "<script>" +
+                "\n$(document).ready( function() {" +
+                "\nsetInterval(function() {" +
+                "$('#env').load('main');" +
+                "\n}, 1000);" +
+                "\n}); " +
+                "\n</script>" +
+                "</head>";
 
         static private final String NEW_JOB_FORM = "<form id=\"new\"><table>" +
                 "<tr><th></th><th>Name</th><th>Type</th>" +
@@ -43,9 +51,6 @@ public class ToyServer {
                 "<td><input type=\"number\" name=\"time\"></td>" +
                 "<td><input type=\"number\" name=\"param\"></td></tr>" +
                 "</table></form>";
-
-        static private final String REFRESH_FORM = "<form id=\"refresh\">" +
-                "<button type=\"submit\" value=\"doit\">Refresh</button></form>";
 
         private Map<String, String> parseQuery(final @NotNull String query) {
             final String[] content = query.split("&");
@@ -95,13 +100,22 @@ public class ToyServer {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
             final URI uri = httpExchange.getRequestURI();
-            final String query = uri.getQuery();
-            if (query != null) {
-                handleQuery(query);
+            //System.out.println(uri);
+            System.out.println(uri.getPath());
+            final String response;
+            if ("/main".equals(uri.getPath())) {
+                response = environment.toHtml();
+            } else if ("/".equals(uri.getPath())) {
+                final String query = uri.getQuery();
+                if (query != null) {
+                    handleQuery(query);
+                }
+                response = "<html>" + HTML_HEAD + "<body><p>Hello from a toy server</p>\n" +
+                        environment.toHtml() + NEW_JOB_FORM + //REFRESH_FORM +
+                        "<p><b>" + status + "</b></p></body></html>";
+            } else {
+                response = "";
             }
-            String response = "<html>" + HTML_HEAD + "<body><p>Hello from a toy server</p>\n" +
-                    environment.toHtml() + NEW_JOB_FORM + REFRESH_FORM +
-                    "<p><b>" + status + "</b></p></body></html>";
             httpExchange.sendResponseHeaders(200, response.length());
             OutputStream out = httpExchange.getResponseBody();
             out.write(response.getBytes());
@@ -113,7 +127,7 @@ public class ToyServer {
 
     private final HttpServer server;
 
-    private final ToyEnvironment environment = new ToyEnvironment();
+    private final ToyEnvironment environment;
 
     private String status = "OK";
 
@@ -140,10 +154,12 @@ public class ToyServer {
 
     /**
      * Constructs a new toy server with a given thread number
-     * @param threadNumber a necessary thread number
+     * @param serverThreadNumber a necessary thread number for a server
+     * @param schedulerThreadNumber a necessary thread number for a scheduler
      */
-    public ToyServer(final int threadNumber) {
-        executor = Executors.newFixedThreadPool(threadNumber);
+    public ToyServer(final int serverThreadNumber, final int schedulerThreadNumber) {
+        environment = new ToyEnvironment(schedulerThreadNumber);
+        executor = Executors.newFixedThreadPool(serverThreadNumber);
         HttpServer server;
         try {
             server = HttpServer.create(new InetSocketAddress(8080), 0);
@@ -164,6 +180,7 @@ public class ToyServer {
      * @param args command line arguments, not in use
      */
     static public void main(String[] args) {
-        new ToyServer(1);
+        // Creates a server with one thread for itself and four threads for a scheduler
+        new ToyServer(1,4);
     }
 }

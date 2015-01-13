@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class ToyEnvironment {
 
-    private final Scheduler scheduler = new TimerScheduler();
+    private final Scheduler scheduler;
 
     private final Map<String, Job> jobs = new HashMap<String, Job>();
 
@@ -27,7 +27,8 @@ public class ToyEnvironment {
     /**
      * Creates an environment with a sample periodic job, duration 1s, period 10s
      */
-    public ToyEnvironment() {
+    public ToyEnvironment(final int threadNumber) {
+        scheduler = new TimerScheduler(threadNumber);
         final Job job = new PeriodicJob(calendar.getTime(), 1000, 10000);
         jobs.put("First", job);
         try {
@@ -108,7 +109,7 @@ public class ToyEnvironment {
      */
     public String toHtml() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("<form id=\"main\"><table><tr><th>Job</th><th>Status</th><th>Progress</th><th></th></tr>");
+        sb.append("<div id=\"env\"><form id=\"main\"><table><tr><th>Job</th><th>Status</th><th>Progress</th><th></th></tr>");
         for (Map.Entry<String, Job> entry: jobs.entrySet()) {
             sb.append("<tr><td>").append(entry.getKey()).append("</td><td>");
             sb.append(entry.getValue()).append("</td><td>");
@@ -117,7 +118,7 @@ public class ToyEnvironment {
             sb.append("<button type=\"submit\" name=\"remove\" value=\"").append(entry.getKey());
             sb.append("\">Remove</button>");
         }
-        sb.append("</table></form>");
+        sb.append("</table></form></div>");
         return sb.toString();
     }
 }
