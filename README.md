@@ -30,14 +30,21 @@ Given tests generally construct a scheduler and a number of jobs, then schedule 
 Back end
 --------
 
-Back end is very straightforward. At the beginning, server constructs one periodic job and starts. HTML page contains a table with existing jobs, and input elements to construct a new one or delete an existing one. At this moment, periodic polling is in use with Refresh button or auto-refresh once per minute.
+Back end is very straightforward. At the beginning, server constructs one periodic job and starts. HTML page contains a table with existing jobs, and input elements to construct a new one or delete an existing one. At this moment, periodic polling once per second is used to update progress and status of jobs.
+
+To use this server, just run it. It listens port number 8080 instead of standard 80. Job status and progress are updates automatically. To create a new job, you should fill its name, choose its type, fill its start time and duration and press "New job". "Start time" field represents an interval between now and job start moment. The following types are supported by the server:
+* One-Shot job -- just runs once and prints "Completed" in status field
+* Periodic job -- runs periodically, first at start time, then after the same pause
+* Sequential job -- job runs once but has ten progress stages, each with a given duration
+* Prime calculator job -- job runs once and calculates all prime numbers up to a given limit
+* Prime checker job -- job runs once and checks whether a given number is prime, it has prime calculator as a prerequisite so cannot run without running prime calculator first
 
 Advancement
 -----------
 
 * Frond-end: Check getReadyStatus() (DONE)
-* Back-end: Try to refresh only job status / progress
-* Back-end: Try to get rid of periodic refreshing
+* Back-end: Refresh only job status / progress (DONE using JS / jQuery)
+* Back-end: Try to get rid of periodic refreshing (may be done using WebSockets or Server side events)
 
 Initiating letter
 -----------------
