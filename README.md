@@ -6,11 +6,11 @@ Architecture
 
 The developed project includes the following:
 
-* a front end with Job and Scheduler interfaces, TimerScheduler as a scheduler implementation, AbstractJob skeleton plus some sample Job implementations
-* some tests for the front end
-* a back end with a toy server based on an HttpServer instance, and a toy environment that contains a scheduler and a set of jobs
+* a back end with Job and Scheduler interfaces, TimerScheduler as a scheduler implementation, AbstractJob skeleton plus some sample Job implementations
+* some tests for the back end
+* a front end with a toy server based on an HttpServer instance, and a toy environment that contains a scheduler and a set of jobs
  
-Front end
+Back end
 ---------
  
 The job interface includes three scheduling opportunities. Implementations can use them together, in this case they are joined by logical and.
@@ -27,10 +27,10 @@ A given implementation of a scheduler is based on a timer to order planned times
 
 Given tests generally construct a scheduler and a number of jobs, then schedule jobs, then observe on their progress. Tests assume that PC is free enough to schedule everything in time.
 
-Back end
+Front end
 --------
 
-Back end is very straightforward. At the beginning, server constructs one periodic job and starts. HTML page contains a table with existing jobs, and input elements to construct a new one or delete an existing one. At this moment, periodic polling once per second is used to update progress and status of jobs.
+Front end is very straightforward. At the beginning, server constructs one periodic job and starts. HTML page contains a table with existing jobs, and input elements to construct a new one or delete an existing one. At this moment, periodic polling once per second is used to update progress and status of jobs.
 
 To use this server, just run it. It listens port number 8080 instead of standard 80. Job status and progress are updates automatically. To create a new job, you should fill its name, choose its type, fill its start time and duration and press "New job". "Start time" field represents an interval between now and job start moment. The following types are supported by the server:
 * One-Shot job -- just runs once and prints "Completed" in status field
@@ -42,9 +42,9 @@ To use this server, just run it. It listens port number 8080 instead of standard
 Advancement
 -----------
 
-* Frond-end: Check getReadyStatus() (DONE)
-* Back-end: Refresh only job status / progress (DONE using JS / jQuery)
-* Back-end: Try to get rid of periodic refreshing (probably can be done using WebSocket or Server-sent events)
+* Back-end: Check getReadyStatus() (DONE)
+* Front-end: Refresh only job status / progress (DONE using JS / jQuery)
+* Front-end: Try to get rid of periodic refreshing (probably can be done using WebSocket or Server-sent events)
 
 Initiating letter
 -----------------
