@@ -44,7 +44,7 @@ Advancement
 
 * Frond-end: Check getReadyStatus() (DONE)
 * Back-end: Refresh only job status / progress (DONE using JS / jQuery)
-* Back-end: Try to get rid of periodic refreshing (may be done using WebSockets or Server side events)
+* Back-end: Try to get rid of periodic refreshing (probably can be done using WebSocket or Server-sent events)
 
 Initiating letter
 -----------------
