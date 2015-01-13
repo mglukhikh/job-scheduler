@@ -26,6 +26,12 @@ public class PrimeCheckJob extends AbstractJob {
 
     private volatile CheckResult result;
 
+    /**
+     * Constructs a prime checker job.
+     * @param plannedTime planned time to run
+     * @param calcJob prime calculator job to take base primes
+     * @param number number to check
+     */
     public PrimeCheckJob(final Date plannedTime, final @NotNull PrimeCalcJob calcJob, final int number) {
         super(plannedTime, Collections.<Job>singleton(calcJob));
         this.calcJob = calcJob;
@@ -33,6 +39,10 @@ public class PrimeCheckJob extends AbstractJob {
         result = CheckResult.UNKNOWN;
     }
 
+    /**
+     * Gets a result of a check
+     * @return either number is prime, or non-prime, or result is unknown
+     */
     public CheckResult getResult() {
         return result;
     }

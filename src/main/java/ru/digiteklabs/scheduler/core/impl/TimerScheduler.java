@@ -12,10 +12,15 @@ import java.util.concurrent.*;
 /**
  * An implementation of a scheduler based on Timer usage
  *
- * Hope this class is thread safe. Check again!
+ * This class is thread safe.
+ *
+ * @author Mikhail Glukhikh
  */
 public class TimerScheduler implements Scheduler, JobObserver {
 
+    /**
+     * Type describing job status, whether it's just planned, or on the run, or finished.
+     */
     private static enum JobStatus {
         /**
          * Job should be run in the future because of its planned time.
@@ -98,6 +103,10 @@ public class TimerScheduler implements Scheduler, JobObserver {
             return !successors.isEmpty();
         }
 
+        /**
+         * Try to execute all job's successors.
+         * A successor is a job which has this job as a prerequisite
+         */
         void trySuccessorsExecution() {
             // Iteration requires external synchronization here
             synchronized(successors) {
@@ -109,6 +118,9 @@ public class TimerScheduler implements Scheduler, JobObserver {
             }
         }
 
+        /**
+         * Checks whether job is ready to run and run it if it's ready
+         */
         void tryExecution() {
             if (status != JobStatus.NOT_READY)
                 return;
@@ -161,6 +173,11 @@ public class TimerScheduler implements Scheduler, JobObserver {
      */
     private final ConcurrentMap<Job, JobTask> jobTaskMap = new ConcurrentHashMap<Job, JobTask>();
 
+    /**
+     * Optional constructor based on a custom executor
+     *
+     * @param executor a base executor for the scheduler
+     */
     protected TimerScheduler(@NotNull final ExecutorService executor) {
         this.executor = executor;
     }
@@ -255,11 +272,13 @@ public class TimerScheduler implements Scheduler, JobObserver {
      * A specific situation occurs if the job runs now.
      * A scheduler can select to interrupt and remove it immediately,
      * or wait until it is completed and remove it after,
-     * or just throw ConcurrentModificationException.
+     * or just throw SchedulingException.
      * <p/>
      * Another specific situation occurs if the job is required for other jobs from
      * scheduling list. A scheduler can select to remove the job and all its dependents,
-     * or just throw ConcurrentModificationException.
+     * or just throw SchedulingException.
+     *
+     * This implementation throws SchedulingException in both specific situations.
      *
      * @param job a job already accepted for scheduling.
      * @return true if job is successfully unregistered, false if job is not on scheduling list
@@ -329,6 +348,11 @@ public class TimerScheduler implements Scheduler, JobObserver {
     /**
      * An auxiliary method that is called when some job is finished.
      * It should reschedule a given job, and try to execute its successors.
+     *
+     * This implementations deletes job from the scheduling list if
+     * it should not be run again AND has no successors.
+     * Otherwise job must be deleted from the scheduling list manually.
+     * 
      * @param job a just finished job
      */
     void reschedule(final Job job) {

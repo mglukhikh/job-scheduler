@@ -18,11 +18,20 @@ public class PrimeCalcJob extends AbstractJob {
 
     private final int limit;
 
+    /**
+     * Constructs a prime calculator job.
+     * @param plannedTime planned time to run
+     * @param limit an upper bound for prime numbers to calculate
+     */
     public PrimeCalcJob(final Date plannedTime, int limit) {
         super(plannedTime);
         this.limit = limit;
     }
 
+    /**
+     * Gets a list of calculated prime numbers
+     * @return a list of calculated prime numbers
+     */
     public List<Integer> getPrimes() {
         return Collections.unmodifiableList(primes);
     }

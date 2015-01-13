@@ -48,6 +48,8 @@ public abstract class AbstractJob implements Job {
      * Should be called, at least, in the beginning of run() with PROGRESS_STARTED,
      * in the end of run() with PROGRESS_FINISHED or PROGRESS_PLANNED.
      *
+     * Calls progressChanged for all observers.
+     *
      * @param progress a new job Sprogress
      */
     protected final void changeProgress(final int progress) {
@@ -61,7 +63,9 @@ public abstract class AbstractJob implements Job {
     }
 
     /**
-     * A protected method for changing job's ready status
+     * A protected method for changing job's ready status.
+     *
+     * Calls readyChanged for all observers.
      *
      * @param readyStatus a new job ready status
      */
@@ -164,6 +168,8 @@ public abstract class AbstractJob implements Job {
      * Normally, this method should return true but for jobs that have successors
      * it's better to return false.
      *
+     * This is a default implementation that always returns true.
+     *
      * @return true if it's allowed to delete job on completion, false otherwise
      */
     public boolean autoDeletedOnCompletion() {
@@ -202,6 +208,8 @@ public abstract class AbstractJob implements Job {
      * Also it's possible to have limitations on moments when observers are added. It's better to add
      * observers before registration in a scheduler.
      *
+     * This implementation supports a set of observers, and allows to add them at any moment of time.
+     *
      * @param observer a new observer
      * @return true if observer is added successfully, false otherwise
      */
@@ -218,8 +226,12 @@ public abstract class AbstractJob implements Job {
      * Also it's possible to have limitations on moments when observers are added or removed.
      * It's better to add / remove observers before registration in a scheduler.
      *
+     * This implementation supports a set of observers, and allows to add them at any moment of time.
+     *
      * @param observer a observer to remove
      * @return true if observer is removed successfully, false otherwise
      */
-    public boolean removeObserver(JobObserver observer) { return observers.remove(observer); }
+    public boolean removeObserver(JobObserver observer) {
+        return observers.remove(observer);
+    }
 }
