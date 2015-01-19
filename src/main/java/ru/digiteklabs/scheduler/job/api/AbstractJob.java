@@ -191,6 +191,27 @@ public abstract class AbstractJob implements Job {
     }
 
     /**
+     * A method that should be called before execution of a job's core.
+     *
+     * Changes job's progress to started
+     *
+     */
+    public void beforeRun() {
+        changeProgress(Job.PROGRESS_STARTED);
+    }
+
+    /**
+     * A method that should be called before execution of a job's core.
+     *
+     * Changes job's progress to finished and sets a new planned time to never.
+     * A periodic job must modify this behaviour because a new planned time should be not never.
+     */
+    public void afterRun() {
+        changeProgress(Job.PROGRESS_FINISHED);
+        changePlannedTime(Job.PLANNED_TIME_NEVER);
+    }
+
+    /**
      * Adds a new observer for this job's state.
      * <p/>
      * A job should pass information about progress change and ready status change to all its observers.

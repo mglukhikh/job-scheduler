@@ -110,6 +110,22 @@ public interface Job extends Runnable {
     int getProgress();
 
     /**
+     * A method that should be called before execution of a job's core.
+     *
+     * Normally, it should at least change job's progress to started
+     *
+     */
+    void beforeRun();
+
+    /**
+     * A method that should be called before execution of a job's core.
+     *
+     * Normally, it should at least change job's progress to finished and set a new planned time
+     *
+     */
+    void afterRun();
+
+    /**
      * Adds a new observer for this job's state.
      *
      * A job should pass information about progress change and ready status change to all its observers.

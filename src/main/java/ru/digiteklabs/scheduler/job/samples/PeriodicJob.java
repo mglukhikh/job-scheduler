@@ -1,7 +1,6 @@
 package ru.digiteklabs.scheduler.job.samples;
 
 import ru.digiteklabs.scheduler.job.api.AbstractJob;
-import ru.digiteklabs.scheduler.job.api.Job;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -42,14 +41,17 @@ public class PeriodicJob extends AbstractJob {
     @Override
     public void run() {
         launchNumber++;
-        changeProgress(Job.PROGRESS_STARTED);
         try {
             if (duration > 0)
                 Thread.sleep(duration);
         } catch (InterruptedException e) {
             System.out.println("A periodic job is interrupted!");
         }
-        changeProgress(Job.PROGRESS_FINISHED);
+    }
+
+    @Override
+    public void afterRun() {
+        super.afterRun();
         changePlannedTime(new Date(Calendar.getInstance().getTimeInMillis() + pause));
     }
 

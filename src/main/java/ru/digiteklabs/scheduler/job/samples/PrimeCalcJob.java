@@ -1,7 +1,6 @@
 package ru.digiteklabs.scheduler.job.samples;
 
 import ru.digiteklabs.scheduler.job.api.AbstractJob;
-import ru.digiteklabs.scheduler.job.api.Job;
 
 import java.util.*;
 
@@ -29,7 +28,6 @@ public class PrimeCalcJob extends AbstractJob {
 
     @Override
     public void run() {
-        changeProgress(Job.PROGRESS_STARTED);
         primes.add(2);
         search:
         for (int i = 3; i <= limit; i += 2) {
@@ -41,8 +39,6 @@ public class PrimeCalcJob extends AbstractJob {
             }
             primes.add(i);
         }
-        changeProgress(Job.PROGRESS_FINISHED);
-        changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
 
     /**

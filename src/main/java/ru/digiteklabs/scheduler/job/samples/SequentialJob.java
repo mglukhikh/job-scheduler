@@ -41,7 +41,6 @@ public class SequentialJob extends AbstractJob {
 
     @Override
     public void run() {
-        changeProgress(Job.PROGRESS_STARTED);
         try {
             for (stage++; stage <= stages; stage++) {
                 if (stageDuration > 0)
@@ -51,7 +50,6 @@ public class SequentialJob extends AbstractJob {
         } catch (InterruptedException e) {
             System.out.println("A sequential job is interrupted!");
         }
-        changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
 
     @Override

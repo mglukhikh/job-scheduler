@@ -124,7 +124,9 @@ public class TimerScheduler implements Scheduler, JobObserver {
                 @Override
                 public void run() {
                     status = JobStatus.RUN;
+                    job.beforeRun();
                     job.run();
+                    job.afterRun();
                     status = JobStatus.FINISHED;
                     reschedule(job);
                 }

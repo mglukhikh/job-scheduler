@@ -39,7 +39,6 @@ public class PrimeCheckJob extends AbstractJob {
 
     @Override
     public void run() {
-        changeProgress(Job.PROGRESS_STARTED);
         for (int pr: calcJob.getPrimes()) {
             if (pr*pr > number) {
                 result = CheckResult.PRIME;
@@ -52,8 +51,6 @@ public class PrimeCheckJob extends AbstractJob {
         }
         if (result == CheckResult.UNKNOWN)
             result = CheckResult.PRIME;
-        changeProgress(Job.PROGRESS_FINISHED);
-        changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
 
     @Override

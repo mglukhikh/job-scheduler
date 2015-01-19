@@ -1,7 +1,6 @@
 package ru.digiteklabs.scheduler.job.samples;
 
 import ru.digiteklabs.scheduler.job.api.AbstractJob;
-import ru.digiteklabs.scheduler.job.api.Job;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -61,7 +60,6 @@ public class OneShotJob extends AbstractJob {
 
     @Override
     public void run() {
-        changeProgress(Job.PROGRESS_STARTED);
         try {
             if (duration > 0)
                 Thread.sleep(duration);
@@ -69,8 +67,6 @@ public class OneShotJob extends AbstractJob {
             System.out.println("An one-shot job is interrupted!");
         }
         completed = true;
-        changeProgress(Job.PROGRESS_FINISHED);
-        changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
 
     @Override
