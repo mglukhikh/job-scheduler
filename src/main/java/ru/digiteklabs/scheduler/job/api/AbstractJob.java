@@ -1,9 +1,7 @@
 package ru.digiteklabs.scheduler.job.api;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A job skeleton implementation which requires only run() method.
@@ -17,7 +15,7 @@ import java.util.Set;
 public abstract class AbstractJob implements Job {
 
     // Conditionally thread-safe (except iterators)
-    private final Set<JobObserver> observers = Collections.synchronizedSet(new HashSet<JobObserver>());
+    private final List<JobObserver> observers = new CopyOnWriteArrayList<JobObserver>();
 
     // Reference and content are immutable
     private final Set<Job> requiredJobs;
@@ -48,15 +46,14 @@ public abstract class AbstractJob implements Job {
      * Should be called, at least, in the beginning of run() with PROGRESS_STARTED,
      * in the end of run() with PROGRESS_FINISHED or PROGRESS_PLANNED.
      *
-     * @param progress a new job Sprogress
+     * @param progress a new job progress
      */
     protected final void changeProgress(final int progress) {
         this.progress = progress;
-        // Iterating through a synchronized set requires external synchronization
-        synchronized(observers) {
-            for (JobObserver observer : observers) {
-                observer.progressChanged(this, progress);
-            }
+        // Now we have CopyOnWriteArrayList and do not require synchronization
+        for (JobObserver observer : observers) {
+            // TODO: what if exception happens?
+            observer.progressChanged(this, progress);
         }
     }
 
@@ -67,11 +64,10 @@ public abstract class AbstractJob implements Job {
      */
     protected final void changeReadyStatus(final boolean readyStatus) {
         this.readyStatus = readyStatus;
-        // Iterating through a synchronized set requires external synchronization
-        synchronized(observers) {
-            for (JobObserver observer : observers) {
-                observer.readyChanged(this, readyStatus);
-            }
+        // Now we have CopyOnWriteArrayList and do not require synchronization
+        for (JobObserver observer : observers) {
+            // TODO: what if exception happens?
+            observer.readyChanged(this, readyStatus);
         }
     }
 
