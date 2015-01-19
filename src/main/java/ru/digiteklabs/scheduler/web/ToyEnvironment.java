@@ -10,7 +10,9 @@ import ru.digiteklabs.scheduler.job.samples.PrimeCalcJob;
 import java.util.*;
 
 /**
- * An environment with a scheduler and an opportunity to add/remove/monitor jobs
+ * An environment with a scheduler and an opportunity to add/remove/monitor jobs.
+ *
+ * Can be considered as a wrapper for a back-end.
  *
  * @author Mikhail Glukhikh
  */
@@ -26,6 +28,8 @@ public class ToyEnvironment {
 
     /**
      * Creates an environment with a sample periodic job, duration 1s, period 10s
+     *
+     * @param threadNumber number of threads to use in a scheduler
      */
     public ToyEnvironment(final int threadNumber) {
         scheduler = new TimerScheduler(threadNumber);

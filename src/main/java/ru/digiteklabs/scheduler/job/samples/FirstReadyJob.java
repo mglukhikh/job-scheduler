@@ -8,7 +8,9 @@ import java.util.Date;
 /**
  * A sample of a ready periodic job which is ready at the beginning
  * and after the bound second job ends execution. It is not ready
- * when the bound second job is on the run
+ * when the bound second job is on the run.
+ *
+ * Assembles ping-pong pair with SecondReadyJob.
  */
 public class FirstReadyJob extends ReadyPeriodicJob implements JobObserver {
 

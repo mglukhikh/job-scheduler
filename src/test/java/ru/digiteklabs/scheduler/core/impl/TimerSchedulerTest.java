@@ -26,6 +26,10 @@ public class TimerSchedulerTest {
 
     }
 
+    /**
+     * Creates one-shot job with immediate run and checks its progress
+     * @throws Exception
+     */
     @Test
     public void testAddVerySimpleJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -40,6 +44,10 @@ public class TimerSchedulerTest {
         assertTrue(job.isCompleted());
     }
 
+    /**
+     * Creates one-shot job with delayed run and checks its progress
+     * @throws Exception
+     */
     @Test
     public void testAddDelayedJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -58,6 +66,10 @@ public class TimerSchedulerTest {
         assertTrue(job.isCompleted());
     }
 
+    /**
+     * Creates long one-shot job and checks its progress
+     * @throws Exception
+     */
     @Test
     public void testAddLongJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -76,6 +88,10 @@ public class TimerSchedulerTest {
         assertTrue(job.isCompleted());
     }
 
+    /**
+     * Creates two one-shot jobs and checks their progress
+     * @throws Exception
+     */
     @Test
     public void testTwoJobs() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -97,6 +113,10 @@ public class TimerSchedulerTest {
         assertTrue(job2.isCompleted());
     }
 
+    /**
+     * Creates one-shot job, schedules it and removes it before run.
+     * @throws Exception
+     */
     @Test
     public void testRemoveJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -115,6 +135,10 @@ public class TimerSchedulerTest {
         assertFalse(job.isCompleted());
     }
 
+    /**
+     * Creates a sequential job and checks its progress and stages.
+     * @throws Exception
+     */
     @Test
     public void testSequentialJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -131,6 +155,10 @@ public class TimerSchedulerTest {
         assertTrue(scheduler.getScheduledJobs().isEmpty());
     }
 
+    /**
+     * Creates a periodic job and runs it a few times
+     * @throws Exception
+     */
     @Test
     public void testPeriodicJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -149,6 +177,10 @@ public class TimerSchedulerTest {
         assertTrue(job.getLaunchNumber() == 3);
     }
 
+    /**
+     * Creates a set of 50 periodic jobs and checks their status at different time moments
+     * @throws Exception
+     */
     @Test
     public void testPeriodicJobSet() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -170,6 +202,10 @@ public class TimerSchedulerTest {
         assertTrue(jobs.get(13).getLaunchNumber() == 2);
     }
 
+    /**
+     * Creates and checks prime calculator
+     * @throws Exception
+     */
     @Test
     public void testPrimeCalcJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -180,6 +216,10 @@ public class TimerSchedulerTest {
         assertTrue(job.getPrimes().size() == 4);
     }
 
+    /**
+     * Creates and checks prime calculator together with prime checker
+     * @throws Exception
+     */
     @Test
     public void testPrimeCheckJob() throws Exception {
         final Scheduler scheduler = new TimerScheduler();
@@ -201,6 +241,10 @@ public class TimerSchedulerTest {
         assertSame(PrimeCheckJob.CheckResult.NOT_PRIME, checkJob2.getResult());
     }
 
+    /**
+     * Creates and checks a ping-pong pair of FirstReadyJob and SecondReadyJob
+     * @throws Exception
+     */
     @Test
     public void testFirstSecond() throws Exception {
         final Scheduler scheduler = new TimerScheduler();

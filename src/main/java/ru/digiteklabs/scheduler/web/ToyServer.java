@@ -17,7 +17,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * A very simple web server
+ * A very simple web server based on HttpServer.
+ *
+ * The only front-end class.
  *
  * @author Mikhail Glukhikh
  */
@@ -131,6 +133,13 @@ public class ToyServer {
 
     private String status = "OK";
 
+    /**
+     * Creates new job by string type, planned time, and a job-dependable parameter.
+     * @param type a string representing job type
+     * @param time a planned time
+     * @param param a parameter
+     * @return a newly constructed job
+     */
     private Job createJob(final String type, final int time, final int param) {
         final Date date = new Date(Calendar.getInstance().getTimeInMillis() + time);
         if ("oneshot".equals(type)) {

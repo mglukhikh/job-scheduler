@@ -6,9 +6,9 @@ Architecture
 
 The developed project includes the following:
 
-* a back end with Job and Scheduler interfaces, TimerScheduler as a scheduler implementation, AbstractJob skeleton plus some sample Job implementations
+* a back end with Job and Scheduler interfaces, TimerScheduler as a scheduler implementation, AbstractJob skeleton plus some sample Job implementations: an one-shot job, a periodic job, a sequential (staged) job, a prime checker that depends on a prime calculator, a ping-pong pair of "First Ready" and "Second Ready" jobs
 * some tests for the back end
-* a front end with a toy server based on an HttpServer instance, and a toy environment that contains a scheduler and a set of jobs
+* a front end with a toy server based on an HttpServer instance, and a toy environment that contains a scheduler and a set of jobs. The frond end uses JavaScript and jQuery for progress auto-refreshing
  
 Back end
 ---------
@@ -45,6 +45,7 @@ Advancement
 * Back-end: Check getReadyStatus() (DONE)
 * Front-end: Refresh only job status / progress (DONE using JS / jQuery)
 * Front-end: Try to get rid of periodic refreshing (probably can be done using WebSocket or Server-sent events)
+* Back-end: more intelligent implementations for add / remove jobs for a scheduler
 
 Initiating letter
 -----------------

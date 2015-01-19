@@ -83,9 +83,21 @@ public interface Job extends Runnable {
      */
     boolean autoDeletedOnCompletion();
 
+    /**
+     * Job that never runs.
+     */
     static final int PROGRESS_NEVER = -1000;
+    /**
+     * Job is planned but not on the run.
+     */
     static final int PROGRESS_PLANNED = -1;
+    /**
+     * Job on the run.
+     */
     static final int PROGRESS_STARTED = 0;
+    /**
+     * Job was on the run, now it's finished.
+     */
     static final int PROGRESS_FINISHED = 1000;
 
     /**

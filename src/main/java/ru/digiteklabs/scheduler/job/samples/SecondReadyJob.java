@@ -6,7 +6,10 @@ import ru.digiteklabs.scheduler.job.api.JobObserver;
 import java.util.Date;
 
 /**
- * A sample of a ready periodic job which is ready after a bound first job ends execution
+ * A sample of a ready periodic job which is ready after a bound first job ends execution.
+ *
+ * Assembles ping-pong pair with FirstReadyJob.
+ *
  */
 public class SecondReadyJob extends ReadyPeriodicJob implements JobObserver {
 

@@ -41,11 +41,11 @@ public interface Scheduler {
      * A specific situation occurs if the job runs now.
      * A scheduler can select to interrupt and remove it immediately,
      * or wait until it is completed and remove it after,
-     * or just throw ConcurrentModificationException.
+     * or just throw SchedulingException.
      *
      * Another specific situation occurs if the job is required for other jobs from
      * scheduling list. A scheduler can select to remove the job and all its dependents,
-     * or just throw ConcurrentModificationException.
+     * or just throw SchedulingException.
      *
      * @param job a job already accepted for scheduling.
      * @return true if job is successfully unregistered, false if job is not on scheduling list

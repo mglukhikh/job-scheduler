@@ -1,7 +1,8 @@
 package ru.digiteklabs.scheduler.core.api;
 
 /**
- * A checked exception for a scheduler
+ * A checked exception for a scheduler.
+ * Used when a scheduler cannot perform some scheduling operation
  *
  * @author Mikhail Glukhikh
  */
