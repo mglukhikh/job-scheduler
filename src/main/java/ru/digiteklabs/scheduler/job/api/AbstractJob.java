@@ -14,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class AbstractJob implements Job {
 
-    // Conditionally thread-safe (except iterators)
+    // Unconditionally thread-safe
     private final List<JobObserver> observers = new CopyOnWriteArrayList<JobObserver>();
 
     // Reference and content are immutable
