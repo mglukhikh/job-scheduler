@@ -45,7 +45,10 @@ Advancement
 * Back-end: Check getReadyStatus() (DONE)
 * Front-end: Refresh only job status / progress (DONE using JS / jQuery)
 * Back-end: Fix a problem with a set of observers (DONE via CopyOnWriteArrayList)
+* Back-end: Get rid of code duplications at job's beginning and end (DONE via beforeRun and afterRun) 
 * Back-end: Refactor progress staff to get rid of constants like PROGRESS_PLANNED and to make flexible progress scale (DONE)
+* Back-end: Think about observer's exceptions and suggest a workaround
+* Tests: split on fragile and stable, make two different files
 * Front-end: Try to get rid of periodic refreshing (probably can be done using WebSocket or Server-sent events)
 * Back-end: more intelligent implementations for add / remove jobs for a scheduler
 
