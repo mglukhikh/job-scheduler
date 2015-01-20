@@ -41,7 +41,7 @@ public class FirstReadyJob extends ReadyPeriodicJob implements JobObserver {
     public void progressChanged(Job job, int progress) {
         if (secondJob != job)
             return;
-        if (progress != Job.PROGRESS_PLANNED && progress != Job.PROGRESS_FINISHED) {
+        if (job.isStarted() && !job.isFinished()) {
             changeReadyStatus(false);
         } else {
             changeReadyStatus(true);

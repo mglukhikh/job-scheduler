@@ -104,7 +104,7 @@ public class ToyEnvironment {
 
     static private int getProgressValue(final Job job) {
         final int progress = job.getProgress();
-        return progress < 0 ? 0 : (progress > Job.PROGRESS_FINISHED ? Job.PROGRESS_FINISHED : progress);
+        return progress < 0 ? 0 : (progress > job.getMaxProgress() ? job.getMaxProgress() : progress);
     }
 
     /**
@@ -118,7 +118,7 @@ public class ToyEnvironment {
             sb.append("<tr><td>").append(entry.getKey()).append("</td><td>");
             sb.append(entry.getValue()).append("</td><td>");
             sb.append("<progress value=\"").append(getProgressValue(entry.getValue())).append("\"");
-            sb.append(" max=\"").append(Job.PROGRESS_FINISHED).append("\"/></td><td>");
+            sb.append(" max=\"").append(entry.getValue().getMaxProgress()).append("\"/></td><td>");
             sb.append("<button type=\"submit\" name=\"remove\" value=\"").append(entry.getKey());
             sb.append("\">Remove</button>");
         }

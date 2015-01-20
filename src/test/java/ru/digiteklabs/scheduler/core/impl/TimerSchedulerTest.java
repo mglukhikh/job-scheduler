@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.digiteklabs.scheduler.core.api.Scheduler;
-import ru.digiteklabs.scheduler.job.api.Job;
 import ru.digiteklabs.scheduler.job.samples.*;
 
 import java.util.ArrayList;
@@ -35,11 +34,10 @@ public class TimerSchedulerTest {
         final Scheduler scheduler = new TimerScheduler();
         final OneShotJob job = new OneShotJob();
         assertFalse(job.isCompleted());
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         scheduler.addJob(job);
-        assertTrue(scheduler.getJobProgress(job) == Job.PROGRESS_PLANNED);
         Thread.sleep(10);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         assertTrue(scheduler.getScheduledJobs().isEmpty());
         assertTrue(job.isCompleted());
     }
@@ -54,14 +52,14 @@ public class TimerSchedulerTest {
         // Job runs in a second after current moment
         final OneShotJob job = new OneShotJob(new Date(Calendar.getInstance().getTimeInMillis() + 1000));
         assertFalse(job.isCompleted());
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         scheduler.addJob(job);
         Thread.sleep(10);
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         assertFalse(scheduler.getScheduledJobs().isEmpty());
         assertFalse(job.isCompleted());
         Thread.sleep(1500);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         assertTrue(scheduler.getScheduledJobs().isEmpty());
         assertTrue(job.isCompleted());
     }
@@ -75,15 +73,14 @@ public class TimerSchedulerTest {
         final Scheduler scheduler = new TimerScheduler();
         final OneShotJob job = new OneShotJob(1000);
         assertFalse(job.isCompleted());
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         scheduler.addJob(job);
         Thread.sleep(10);
-        assertTrue(job.getProgress() == Job.PROGRESS_STARTED);
-        assertTrue(scheduler.getJobProgress(job) == Job.PROGRESS_STARTED);
+        assertTrue(job.isStarted());
         assertFalse(scheduler.getScheduledJobs().isEmpty());
         assertFalse(job.isCompleted());
         Thread.sleep(1500);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         assertTrue(scheduler.getScheduledJobs().isEmpty());
         assertTrue(job.isCompleted());
     }
@@ -100,16 +97,15 @@ public class TimerSchedulerTest {
         scheduler.addJob(job1);
         scheduler.addJob(job2);
         Thread.sleep(250);
-        assertTrue(job1.getProgress() == Job.PROGRESS_PLANNED);
-        assertTrue(scheduler.getJobProgress(job1) == Job.PROGRESS_PLANNED);
+        assertFalse(job1.isStarted());
         assertFalse(job1.isCompleted());
         Thread.sleep(500);
-        assertTrue(job1.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job1.isFinished());
         assertTrue(job1.isCompleted());
-        assertTrue(job2.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job2.isStarted());
         assertFalse(job2.isCompleted());
         Thread.sleep(500);
-        assertTrue(job2.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job2.isFinished());
         assertTrue(job2.isCompleted());
     }
 
@@ -123,14 +119,14 @@ public class TimerSchedulerTest {
         // Job runs in a second after current moment
         final OneShotJob job = new OneShotJob(new Date(Calendar.getInstance().getTimeInMillis() + 1000));
         assertFalse(job.isCompleted());
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         scheduler.addJob(job);
         Thread.sleep(10);
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         assertFalse(scheduler.getScheduledJobs().isEmpty());
         assertFalse(job.isCompleted());
         scheduler.removeJob(job);
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         assertTrue(scheduler.getScheduledJobs().isEmpty());
         assertFalse(job.isCompleted());
     }
@@ -144,14 +140,14 @@ public class TimerSchedulerTest {
         final Scheduler scheduler = new TimerScheduler();
         final SequentialJob job = new SequentialJob(10, new Date(Calendar.getInstance().getTimeInMillis() + 500), 100);
         assertTrue(job.getStage()==0);
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         scheduler.addJob(job);
         Thread.sleep(750);
         assertTrue(job.getStage() == 3);
         Thread.sleep(500);
         assertTrue(job.getStage() == 8);
         Thread.sleep(500);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         assertTrue(scheduler.getScheduledJobs().isEmpty());
     }
 
@@ -164,14 +160,14 @@ public class TimerSchedulerTest {
         final Scheduler scheduler = new TimerScheduler();
         final PeriodicJob job = new PeriodicJob(new Date(Calendar.getInstance().getTimeInMillis() + 500), 500, 500);
         assertTrue(job.getLaunchNumber() == 0);
-        assertTrue(job.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(job.isStarted());
         scheduler.addJob(job);
         Thread.sleep(1250);
         assertTrue(job.getLaunchNumber() == 1);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         Thread.sleep(2000);
         assertTrue(job.getLaunchNumber() == 3);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         scheduler.removeJob(job);
         Thread.sleep(1000);
         assertTrue(job.getLaunchNumber() == 3);
@@ -212,7 +208,7 @@ public class TimerSchedulerTest {
         final PrimeCalcJob job = new PrimeCalcJob(Calendar.getInstance().getTime(), 10);
         scheduler.addJob(job);
         Thread.sleep(100);
-        assertTrue(job.getProgress() == Job.PROGRESS_FINISHED);
+        assertTrue(job.isFinished());
         assertTrue(job.getPrimes().size() == 4);
     }
 
@@ -230,14 +226,14 @@ public class TimerSchedulerTest {
         scheduler.addJob(checkJob);
         scheduler.addJob(checkJob2);
         Thread.sleep(200);
-        assertTrue(checkJob.getProgress() == Job.PROGRESS_PLANNED);
-        assertTrue(checkJob2.getProgress() == Job.PROGRESS_PLANNED);
+        assertFalse(checkJob.isStarted());
+        assertFalse(checkJob2.isStarted());
         Thread.sleep(800);
-        assertTrue(checkJob.getProgress() == Job.PROGRESS_FINISHED);
-        assertTrue(checkJob2.getProgress() == Job.PROGRESS_PLANNED);
+        assertTrue(checkJob.isFinished());
+        assertFalse(checkJob2.isStarted());
         assertSame(PrimeCheckJob.CheckResult.PRIME, checkJob.getResult());
         Thread.sleep(800);
-        assertEquals(Job.PROGRESS_FINISHED, checkJob2.getProgress());
+        assertTrue(checkJob2.isFinished());
         assertSame(PrimeCheckJob.CheckResult.NOT_PRIME, checkJob2.getResult());
     }
 

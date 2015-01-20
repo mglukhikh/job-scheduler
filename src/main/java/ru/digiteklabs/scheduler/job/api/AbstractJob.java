@@ -14,6 +14,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class AbstractJob implements Job {
 
+    /**
+     * Job which is not yet started or waits for the next start
+     */
+    static final int PROGRESS_NOT_STARTED = -1;
+    /**
+     * Job which has just started.
+     */
+    static final int PROGRESS_STARTED = 0;
+    /**
+     * Job was on the run, now it's finished.
+     */
+    static final int PROGRESS_FINISHED = 1000;
+
     // Unconditionally thread-safe
     private final List<JobObserver> observers = new CopyOnWriteArrayList<JobObserver>();
 
@@ -24,7 +37,7 @@ public abstract class AbstractJob implements Job {
     private volatile Date plannedTime = Job.PLANNED_TIME_NEVER;
 
     // Thread-safe
-    private volatile int progress = Job.PROGRESS_PLANNED;
+    private volatile int progress = PROGRESS_NOT_STARTED;
 
     // Thread-safe
     private volatile boolean readyStatus = true;
@@ -168,26 +181,49 @@ public abstract class AbstractJob implements Job {
 
     /**
      * Gets information about this job progress.
-     * <p/>
-     * It is an integer with the following meaning:<ul>
-     * <li>PROGRESS_NEVER means this job should be never started</li>
-     * <li>PROGRESS_PLANNED means this job is planned but not yet started</li>
-     * <li>number from PROGRESS_STARTED to PROGRESS_FINISHED-1 means this job is started,
-     * the more is the number, the more of this job is done</li>
-     * <li>PROGRESS_FINISHED and more means this job is completed</li>
-     * </ul>
-     * <p/>
-     * Normally, job should set its progress to negative number (PROGRESS_PLANNED) when created.
-     * Immediately after its run() method is called, progress should be set to PROGRESS_STARTED and
-     * then slowly increase to PROGRESS_FINISHED-1.
-     * PROGRESS_FINISHED should be set by the last run() statement.
-     * In case this job is recurring and should be run again, PROGRESS_PLANNED is set again instead.
+     *
+     * This implementation sets AbstractJob.PROGRESS_NOT_STARTED during construction,
+     * then sets AbstractJob.PROGRESS_STARTED in beforeRun() and AbstractJob.PROGRESS_FINISHED in afterRun().
      *
      * @return integer-encoded job progress
      */
     @Override
-    public int getProgress() {
+    public final int getProgress() {
         return progress;
+    }
+
+    /**
+     * Gets a maximum possible value of a Job's progress
+     *
+     * @return a maximum possible value of a Job's progress
+     */
+    @Override
+    public int getMaxProgress() {
+        return PROGRESS_FINISHED;
+    }
+
+    /**
+     * Checks whether this job was started.
+     *
+     * Job is considered as started if its progress is non-negative
+     *
+     * @return true if job is started, false otherwise
+     */
+    @Override
+    public final boolean isStarted() {
+        return progress >= 0;
+    }
+
+    /**
+     * Checks whether this job was finished.
+     *
+     * Job is considered as finished if its progress is equals to its maximum value
+     *
+     * @return true if job is finished, false otherwise
+     */
+    @Override
+    public final boolean isFinished() {
+        return progress == getMaxProgress();
     }
 
     /**
@@ -197,17 +233,17 @@ public abstract class AbstractJob implements Job {
      *
      */
     public void beforeRun() {
-        changeProgress(Job.PROGRESS_STARTED);
+        changeProgress(PROGRESS_STARTED);
     }
 
     /**
      * A method that should be called before execution of a job's core.
      *
-     * Changes job's progress to finished and sets a new planned time to never.
+     * Changes job's progress to getMaxProgress() and sets a new planned time to never.
      * A periodic job must modify this behaviour because a new planned time should be not never.
      */
     public void afterRun() {
-        changeProgress(Job.PROGRESS_FINISHED);
+        changeProgress(getMaxProgress());
         changePlannedTime(Job.PLANNED_TIME_NEVER);
     }
 

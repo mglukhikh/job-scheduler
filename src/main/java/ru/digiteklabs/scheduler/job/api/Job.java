@@ -84,42 +84,50 @@ public interface Job extends Runnable {
     boolean autoDeletedOnCompletion();
 
     /**
-     * Job that never runs.
-     */
-    static final int PROGRESS_NEVER = -1000;
-    /**
-     * Job is planned but not on the run.
-     */
-    static final int PROGRESS_PLANNED = -1;
-    /**
-     * Job on the run.
-     */
-    static final int PROGRESS_STARTED = 0;
-    /**
-     * Job was on the run, now it's finished.
-     */
-    static final int PROGRESS_FINISHED = 1000;
-
-    /**
      * Gets information about this job progress.
      *
      * It is an integer with the following meaning:<ul>
-     *     <li>PROGRESS_NEVER means this job should be never started</li>
-     *     <li>PROGRESS_PLANNED means this job is planned but not yet started</li>
-     *     <li>number from PROGRESS_STARTED to PROGRESS_FINISHED-1 means this job is started,
+     *     <li>negative value means this job is not yet started</li>
+     *     <li>non-negative number less than getMaxProgress() means this job is started and not finished,
      *     the more is the number, the more of this job is done</li>
-     *     <li>PROGRESS_FINISHED and more means this job is completed</li>
+     *     <li>same value as getMaxProgress() and more means this job is completed</li>
      * </ul>
      *
-     * Normally, job should set its progress to negative number (PROGRESS_PLANNED) when created.
-     * Immediately after its run() method is called, progress should be set to PROGRESS_STARTED and
-     * then slowly increase to PROGRESS_FINISHED-1.
-     * PROGRESS_FINISHED should be set by the last run() statement.
-     * In case this job is recurring and should be run again, PROGRESS_PLANNED is set again instead.
+     * Normally, job should set its progress to negative number when created.
+     * Immediately when beforeRun() method is called, progress should be set to 0 and
+     * then slowly increase to getMaxProgress()-1 during run() execution.
+     * The same value as getMaxProgress() should be set by afterRun() method.
+     * In case this job is recurring and should be run again, negative value can be set again instead.
+     * Leave progress as getMaxProgress() is also OK in this case.
      *
      * @return integer-encoded job progress
      */
     int getProgress();
+
+    /**
+     * Gets a maximum possible value of a Job's progress
+     *
+     * @return a maximum possible value of a Job's progress
+     */
+    int getMaxProgress();
+
+    /**
+     * Checks whether this job was started.
+     *
+     * Job is considered as started if its progress is non-negative
+     *
+     * @return true if job is started, false otherwise
+     */
+    boolean isStarted();
+
+    /**
+     * Checks whether this job was finished.
+     *
+     * Job is considered as finished if its progress is equals to its maximum value
+     *
+     * @return true if job is finished, false otherwise
+     */
+    boolean isFinished();
 
     /**
      * A method that should be called before execution of a job's core.

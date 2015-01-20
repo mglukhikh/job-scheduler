@@ -55,8 +55,6 @@ public class TimerScheduler implements Scheduler, JobObserver {
          */
         private final Job job;
 
-        private volatile int progress;
-
         private volatile boolean ready;
 
         private volatile JobStatus status;
@@ -69,17 +67,8 @@ public class TimerScheduler implements Scheduler, JobObserver {
 
         JobTask(final Job job) {
             this.job = job;
-            progress = Job.PROGRESS_PLANNED;
             ready = false;
             status = JobStatus.FUTURE;
-        }
-
-        int getProgress() {
-            return progress;
-        }
-
-        void setProgress(int progress) {
-            this.progress = progress;
         }
 
         void setReadyStatus(boolean ready) {
@@ -206,22 +195,16 @@ public class TimerScheduler implements Scheduler, JobObserver {
     /**
      * Called when a given job changes its progress.
      *
-     * Thread-unsafe because assumes that it is called only from job's thread
-     *
      * @param job      a given job
      * @param progress job's progress
      */
     @Override
     public void progressChanged(Job job, int progress) {
-        final JobTask jt = jobTaskMap.get(job);
-        if (jt != null)
-            jt.setProgress(progress);
+        // DO NOTHING
     }
 
     /**
      * Called when a given job changes its ready status.
-     *
-     * Thread-unsafe. NB: think about who can call it.
      *
      * @param job   a given job
      * @param ready true if job is ready to run, false otherwise
@@ -326,25 +309,6 @@ public class TimerScheduler implements Scheduler, JobObserver {
     @Override
     public Set<Job> getScheduledJobs() {
         return Collections.unmodifiableSet(jobTaskMap.keySet());
-    }
-
-    /**
-     * Gets a progress of a given job.
-     * <p/>
-     * Normally should be called only for jobs on scheduling list using getScheduledJobs() first.
-     * Then should return a progress of a job using its getProgress() method.
-     * Otherwise must return Job.PROGRESS_NEVER.
-     *
-     * @param job a given job
-     * @return integer-encoded progress
-     */
-    @Override
-    public int getJobProgress(Job job) {
-        final JobTask jt = jobTaskMap.get(job);
-        if (jt != null)
-            return jt.getProgress();
-        else
-            return Job.PROGRESS_NEVER;
     }
 
     /**

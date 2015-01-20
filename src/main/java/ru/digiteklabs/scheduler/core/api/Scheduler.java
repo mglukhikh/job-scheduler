@@ -67,16 +67,4 @@ public interface Scheduler {
      * @return a set of jobs on the current scheduling list
      */
     Set<Job> getScheduledJobs();
-
-    /**
-     * Gets a progress of a given job.
-     *
-     * Normally should be called only for jobs on scheduling list using getScheduledJobs() first.
-     * Then should return a progress of a job using its getProgress() method.
-     * Otherwise must return Job.PROGRESS_NEVER.
-     *
-     * @param job a given job
-     * @return integer-encoded progress
-     */
-    int getJobProgress(Job job);
 }

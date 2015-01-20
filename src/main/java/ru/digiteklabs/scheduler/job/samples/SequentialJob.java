@@ -1,7 +1,6 @@
 package ru.digiteklabs.scheduler.job.samples;
 
 import ru.digiteklabs.scheduler.job.api.AbstractJob;
-import ru.digiteklabs.scheduler.job.api.Job;
 
 import java.util.Date;
 
@@ -45,11 +44,15 @@ public class SequentialJob extends AbstractJob {
             for (stage++; stage <= stages; stage++) {
                 if (stageDuration > 0)
                     Thread.sleep(stageDuration);
-                changeProgress(Job.PROGRESS_FINISHED * stage / stages);
+                changeProgress(stage);
             }
         } catch (InterruptedException e) {
             System.out.println("A sequential job is interrupted!");
         }
+    }
+
+    public int getMaxProgress() {
+        return stages;
     }
 
     @Override
